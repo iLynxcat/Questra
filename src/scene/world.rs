@@ -1,4 +1,7 @@
-use crate::level::{Level, LevelBlock, block::Material};
+use crate::level::{
+    Level, LevelBlock,
+    block::{BlockFace, Material},
+};
 use raylib::{
     RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, ffi::KeyboardKey,
     math::Vector3, prelude::*,
@@ -8,7 +11,7 @@ const MOVE_SPEED: f32 = 5.0;
 
 pub struct WorldScene {
     pub is_frozen: bool,
-    pub hovered_block: Option<(i32, i32, i32)>,
+    pub hovered_block: Option<(i32, i32, i32, BlockFace)>,
 
     camera: Camera3D,
     level: Level,
@@ -38,7 +41,7 @@ impl WorldScene {
         let mouse = rl.get_mouse_position();
         let ray = rl.get_screen_to_world_ray(mouse, self.camera);
 
-        let mut targeted_block: Option<(f32, &LevelBlock)> = None;
+        let mut targeted_block: Option<(f32, &LevelBlock, BlockFace)> = None;
 
         for block in &self.level.blocks {
             if block.block.material == Material::Air {
@@ -52,16 +55,41 @@ impl WorldScene {
             };
             let hit = bbox.get_ray_collision_box(ray);
             if hit.hit {
-                if targeted_block.is_none() || hit.distance < targeted_block.unwrap().0 {
-                    targeted_block = Some((hit.distance, block));
+                if targeted_block.is_none() || hit.distance < targeted_block.as_ref().unwrap().0 {
+                    targeted_block = Some((hit.distance, block, face_from_normal(hit.normal)));
                 }
             }
         }
 
-        if let Some((_, block)) = targeted_block {
-            self.hovered_block = Some((block.x, block.y, block.z));
+        if let Some((_, block, face)) = targeted_block {
+            self.hovered_block = Some((block.x, block.y, block.z, face));
         } else {
             self.hovered_block = None;
+        }
+
+        if let Some((x, y, z, face)) = self.hovered_block {
+            if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
+                if let Some(block) = self
+                    .level
+                    .blocks
+                    .iter_mut()
+                    .find(|b| b.x == x && b.y == y && b.z == z)
+                {
+                    block.block = Material::Air.default();
+                }
+            } else if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) {
+                let (ox, oy, oz) = face.offset();
+                let (x, y, z) = (x + ox, y + oy, z + oz);
+
+                if let Some(block) = self
+                    .level
+                    .blocks
+                    .iter_mut()
+                    .find(|b| b.x == x && b.y == y && b.z == z)
+                {
+                    block.block = Material::Stone.default();
+                }
+            }
         }
 
         let movement_delta: Vector3 = {
@@ -116,7 +144,7 @@ impl WorldScene {
             d3.draw_cube(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, color);
         }
 
-        if let Some((x, y, z)) = &self.hovered_block {
+        if let Some((x, y, z, ..)) = &self.hovered_block {
             let (x, y, z) = (*x as f32, *y as f32, *z as f32);
 
             d3.draw_cube_wires(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, Color::RED);
@@ -131,5 +159,22 @@ impl WorldScene {
         if self.is_frozen {
             d.draw_text("Frozen", 10, 30, 18, Color::WHITE);
         }
+    }
+}
+
+// TODO: put this in a better place
+fn face_from_normal(normal: Vector3) -> BlockFace {
+    if normal.y > 0.5 {
+        BlockFace::Up
+    } else if normal.y < -0.5 {
+        BlockFace::Down
+    } else if normal.x > 0.5 {
+        BlockFace::North
+    } else if normal.x < -0.5 {
+        BlockFace::East
+    } else if normal.z > 0.5 {
+        BlockFace::South
+    } else {
+        BlockFace::West
     }
 }

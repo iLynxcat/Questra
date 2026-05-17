@@ -1,6 +1,6 @@
 use crate::level::block::{Block, BlockState};
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Material {
     Air = 0,
     Barrier = 1,
