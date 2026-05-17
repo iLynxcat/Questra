@@ -1,7 +1,7 @@
 use crate::{
     assets::GameAssets,
     level::Level,
-    scene::{Scene, world::WorldScene},
+    scene::{Scene, title::TitleScene, world::WorldScene},
 };
 use raylib::{RaylibHandle, RaylibThread};
 
