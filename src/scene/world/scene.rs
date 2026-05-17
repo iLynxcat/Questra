@@ -15,6 +15,8 @@ pub struct WorldScene {
     pub is_showing_pause_menu: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
+    rotation: f32,
+
     camera: Camera3D,
     level: Level,
 }
@@ -25,6 +27,8 @@ impl WorldScene {
             is_frozen: false,
             is_showing_pause_menu: false,
             hovered_block: None,
+
+            rotation: 0.0,
 
             camera: Camera3D::orthographic(
                 Vector3::new(30.0, 30.0, 30.0),
@@ -46,6 +50,11 @@ impl WorldScene {
 
         if self.is_frozen {
             return;
+        }
+
+        self.rotation += 1.0;
+        if self.rotation >= 360.0 {
+            self.rotation = 0.0;
         }
 
         let mouse = rl.get_mouse_position();
@@ -160,11 +169,15 @@ impl WorldScene {
             d3.draw_cube_wires(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, Color::RED);
         }
 
-        d3.draw_billboard(
+        d3.draw_billboard_pro(
             &self.camera,
-            &assets.player_sprite,
+            *assets.player_sprite,
+            Rectangle::new(0.0, 0.0, 64.0, 64.0),
             Vector3::new(0.0, 6.5, 0.0),
-            1.0,
+            Vector3::up(),
+            Vector2::new(1.0, 1.0),
+            Vector2::zero(),
+            self.rotation,
             Color::WHITE,
         );
 
