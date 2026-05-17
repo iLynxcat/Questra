@@ -44,8 +44,8 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
             || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
         {
-            self.is_frozen = !self.is_frozen;
-            self.is_showing_pause_menu = self.is_frozen;
+            self.is_showing_pause_menu = !self.is_showing_pause_menu;
+            self.is_frozen = self.is_showing_pause_menu;
         }
 
         if self.is_frozen {
