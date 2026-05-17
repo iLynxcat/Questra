@@ -1,6 +1,5 @@
-use raylib::math::Vector3;
 
-use crate::level::block::{Block, BlockFace, Material};
+use crate::level::block::{Block, Material};
 
 pub struct Level {
     pub blocks: Vec<LevelBlock>,
