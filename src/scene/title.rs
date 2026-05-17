@@ -2,6 +2,6 @@ use raylib::{RaylibHandle, camera::Camera3D, drawing::RaylibDrawHandle};
 
 use crate::state::GameState;
 
-pub fn update(rl: &RaylibHandle, cam: &mut Camera3D, state: &mut GameState) {}
+pub fn update(_: &RaylibHandle, _: &mut Camera3D, _: &mut GameState) {}
 
-pub fn draw(d: &mut RaylibDrawHandle, cam: &Camera3D, state: &GameState) {}
+pub fn draw(_: &mut RaylibDrawHandle, _: &Camera3D, _: &GameState) {}
