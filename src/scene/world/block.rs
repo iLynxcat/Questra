@@ -6,7 +6,8 @@ pub fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Colo
     let (z0, z1) = (z - 0.5, z + 0.5);
 
     let top = color;
-    let side = color.brightness(-0.2);
+    let side_a = color.brightness(-0.2);
+    let side_b = color.brightness(-0.1);
     let bottom = color.brightness(-0.4);
 
     // top
@@ -34,7 +35,7 @@ pub fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Colo
         [x1, y0, z1],
         [x1, y1, z1],
         [x0, y1, z1],
-        side,
+        side_a,
     );
     // back (z-)
     draw_quad(
@@ -43,7 +44,7 @@ pub fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Colo
         [x0, y0, z0],
         [x0, y1, z0],
         [x1, y1, z0],
-        side,
+        side_a,
     );
     // right (x+)
     draw_quad(
@@ -52,7 +53,7 @@ pub fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Colo
         [x1, y0, z0],
         [x1, y1, z0],
         [x1, y1, z1],
-        side,
+        side_b,
     );
     // left (x-)
     draw_quad(
@@ -61,7 +62,7 @@ pub fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Colo
         [x0, y0, z1],
         [x0, y1, z1],
         [x0, y1, z0],
-        side,
+        side_b,
     );
 }
 
