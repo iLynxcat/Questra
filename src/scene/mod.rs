@@ -1,9 +1,9 @@
-use crate::scene::world::WorldScene;
+use crate::scene::{title::TitleScene, world::WorldScene};
 
 pub mod title;
 pub mod world;
 
 pub enum Scene {
-    // Title(TitleScene),
+    Title(TitleScene),
     World(WorldScene),
 }

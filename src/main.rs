@@ -14,6 +14,10 @@ fn main() {
 
     while !rl.window_should_close() {
         match &mut state.scene {
+            Scene::Title(scene) => {
+                scene.update(&rl);
+                scene.draw(&mut rl.begin_drawing(&thread));
+            }
             Scene::World(scene) => {
                 scene.update(&rl);
                 scene.draw(&mut rl.begin_drawing(&thread), &state.assets);
