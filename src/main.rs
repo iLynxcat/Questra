@@ -1,6 +1,5 @@
 use questra::{
-    level::{Level, block::Material},
-    scene::{Scene, world::WorldScene},
+    scene::Scene,
     state::GameState,
 };
 use raylib::ffi::KeyboardKey;

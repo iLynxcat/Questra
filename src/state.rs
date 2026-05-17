@@ -1,6 +1,6 @@
 use crate::{
     assets::GameAssets,
-    level::{Level, block::Material},
+    level::Level,
     scene::{Scene, world::WorldScene},
 };
 use raylib::{RaylibHandle, RaylibThread};
