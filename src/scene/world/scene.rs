@@ -183,6 +183,17 @@ impl WorldScene {
 
         drop(d3);
 
+        // let mut b = d.begin_blend_mode(BlendMode::BLEND_CUSTOM);
+        // unsafe {
+        //     raylib_sys::rlSetBlendFactors(
+        //         RL_ONE_MINUS_DST_COLOR as i32,
+        //         RL_ONE_MINUS_SRC_ALPHA as i32,
+        //         RL_FUNC_ADD as i32,
+        //     );
+        // }
+        // b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
+        // drop(b);
+
         d.draw_text("Questra", 10, 10, 18, Color::WHITE);
         if self.is_showing_pause_menu {
             d.draw_text("Pause", 10, 34, 18, Color::WHITE);
