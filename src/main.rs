@@ -3,6 +3,7 @@ use questra::{
     scene::{Scene, world::WorldScene},
     state::GameState,
 };
+use raylib::ffi::KeyboardKey;
 
 fn main() {
     let (mut rl, thread) = raylib::init() //
@@ -11,6 +12,7 @@ fn main() {
         .build();
 
     rl.set_target_fps(60);
+    rl.set_exit_key(Some(KeyboardKey::KEY_Q));
 
     let mut state = GameState::load(&mut rl, &thread);
 

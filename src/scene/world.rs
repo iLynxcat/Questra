@@ -27,14 +27,16 @@ impl WorldScene {
                 Vector3::new(30.0, 30.0, 30.0),
                 Vector3::new(0.0, 1.0, 0.0),
                 Vector3::new(0.0, 1.0, 0.0),
-                8.0,
+                10.0,
             ),
             level,
         }
     }
 
     pub fn update(&mut self, rl: &RaylibHandle) {
-        if rl.is_key_pressed(KeyboardKey::KEY_Q) {
+        if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+            || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
+        {
             self.is_frozen = !self.is_frozen;
         }
 
@@ -161,7 +163,8 @@ impl WorldScene {
 
         d.draw_text("Questra", 10, 10, 18, Color::WHITE);
         if self.is_frozen {
-            d.draw_text("Frozen", 10, 30, 18, Color::WHITE);
+            d.draw_text("Frozen", 10, 34, 18, Color::WHITE);
+            d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
         }
     }
 }
