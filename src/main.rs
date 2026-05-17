@@ -1,7 +1,4 @@
-use questra::{
-    scene::Scene,
-    state::GameState,
-};
+use questra::{scene::Scene, state::GameState};
 use raylib::ffi::KeyboardKey;
 
 fn main() {
@@ -19,7 +16,7 @@ fn main() {
         match &mut state.scene {
             Scene::World(scene) => {
                 scene.update(&rl);
-                scene.draw(&mut rl.begin_drawing(&thread));
+                scene.draw(&mut rl.begin_drawing(&thread), &state.assets);
             }
         }
     }

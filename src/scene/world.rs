@@ -1,6 +1,6 @@
-use crate::level::{
-    Level, LevelBlock,
-    block::{BlockFace, Material},
+use crate::{
+    assets::GameAssets,
+    level::{Level, LevelBlock, block::Material},
 };
 use raylib::{
     RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, ffi::KeyboardKey,
@@ -131,7 +131,7 @@ impl WorldScene {
         self.camera.target = self.camera.target + movement_delta;
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::SKYBLUE);
 
         let mut d3 = d.begin_mode3D(&self.camera);
@@ -156,8 +156,13 @@ impl WorldScene {
             d3.draw_cube_wires(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, Color::RED);
         }
 
-        // player sprite
-        // d3.draw_billboard(&cam, None, center, size, Color::WHITE);
+        d3.draw_billboard(
+            &self.camera,
+            &assets.player_sprite,
+            Vector3::new(0.0, 6.5, 0.0),
+            1.0,
+            Color::WHITE,
+        );
 
         drop(d3);
 
