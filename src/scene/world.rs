@@ -11,7 +11,7 @@ const MOVE_SPEED: f32 = 5.0;
 
 pub struct WorldScene {
     pub is_frozen: bool,
-    pub hovered_block: Option<(i32, i32, i32, BlockFace)>,
+    pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
     camera: Camera3D,
     level: Level,
@@ -47,7 +47,7 @@ impl WorldScene {
         let mouse = rl.get_mouse_position();
         let ray = rl.get_screen_to_world_ray(mouse, self.camera);
 
-        let mut targeted_block: Option<(f32, &LevelBlock, BlockFace)> = None;
+        let mut targeted_block: Option<(f32, &LevelBlock, Vector3)> = None;
 
         for block in &self.level.blocks {
             if block.block.material == Material::Air {
@@ -62,18 +62,18 @@ impl WorldScene {
             let hit = bbox.get_ray_collision_box(ray);
             if hit.hit {
                 if targeted_block.is_none() || hit.distance < targeted_block.as_ref().unwrap().0 {
-                    targeted_block = Some((hit.distance, block, face_from_normal(hit.normal)));
+                    targeted_block = Some((hit.distance, block, hit.normal));
                 }
             }
         }
 
-        if let Some((_, block, face)) = targeted_block {
-            self.hovered_block = Some((block.x, block.y, block.z, face));
+        if let Some((_, block, normal)) = targeted_block {
+            self.hovered_block = Some((block.x, block.y, block.z, normal));
         } else {
             self.hovered_block = None;
         }
 
-        if let Some((x, y, z, face)) = self.hovered_block {
+        if let Some((x, y, z, normal)) = self.hovered_block {
             if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
                 if let Some(block) = self
                     .level
@@ -84,7 +84,7 @@ impl WorldScene {
                     block.block = Material::Air.default();
                 }
             } else if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) {
-                let (ox, oy, oz) = face.offset();
+                let (ox, oy, oz) = offset_from_normal(normal);
                 let (x, y, z) = (x + ox, y + oy, z + oz);
 
                 if let Some(block) = self
@@ -170,20 +170,12 @@ impl WorldScene {
 }
 
 // TODO: put this in a better place
-fn face_from_normal(normal: Vector3) -> BlockFace {
-    if normal.y > 0.5 {
-        BlockFace::Up
-    } else if normal.y < -0.5 {
-        BlockFace::Down
-    } else if normal.x > 0.5 {
-        BlockFace::North
-    } else if normal.x < -0.5 {
-        BlockFace::East
-    } else if normal.z > 0.5 {
-        BlockFace::South
-    } else {
-        BlockFace::West
-    }
+fn offset_from_normal(normal: Vector3) -> (i32, i32, i32) {
+    (
+        normal.x.round() as i32,
+        normal.y.round() as i32,
+        normal.z.round() as i32,
+    )
 }
 
 fn draw_block(d: &mut impl RaylibDraw3D, x: f32, y: f32, z: f32, color: Color) {

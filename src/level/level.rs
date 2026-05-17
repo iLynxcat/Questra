@@ -1,10 +1,10 @@
-
 use crate::level::block::{Block, Material};
 
 pub struct Level {
     pub blocks: Vec<LevelBlock>,
 }
 
+#[derive(Debug)]
 pub struct LevelBlock {
     pub x: i32,
     pub y: i32,
