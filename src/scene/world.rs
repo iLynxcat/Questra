@@ -11,6 +11,7 @@ const MOVE_SPEED: f32 = 5.0;
 
 pub struct WorldScene {
     pub is_frozen: bool,
+    pub is_showing_pause_menu: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
     camera: Camera3D,
@@ -21,6 +22,7 @@ impl WorldScene {
     pub fn new(level: Level) -> Self {
         Self {
             is_frozen: false,
+            is_showing_pause_menu: false,
             hovered_block: None,
 
             camera: Camera3D::orthographic(
@@ -38,6 +40,7 @@ impl WorldScene {
             || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
         {
             self.is_frozen = !self.is_frozen;
+            self.is_showing_pause_menu = self.is_frozen;
         }
 
         if self.is_frozen {
@@ -131,7 +134,7 @@ impl WorldScene {
         self.camera.target = self.camera.target + movement_delta;
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::SKYBLUE);
 
         let mut d3 = d.begin_mode3D(&self.camera);
@@ -167,7 +170,10 @@ impl WorldScene {
         drop(d3);
 
         d.draw_text("Questra", 10, 10, 18, Color::WHITE);
-        if self.is_frozen {
+        if self.is_showing_pause_menu {
+            d.draw_text("Pause", 10, 34, 18, Color::WHITE);
+            d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
+        } else if self.is_frozen {
             d.draw_text("Frozen", 10, 34, 18, Color::WHITE);
             d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
         }
