@@ -1,4 +1,6 @@
-use crate::level::block::{Block, Material};
+use raylib::math::Vector3;
+
+use crate::level::block::{Block, BlockFace, Material};
 
 pub struct Level {
     pub blocks: Vec<LevelBlock>,
@@ -21,12 +23,7 @@ impl Level {
         for x in 0..LEVEL_XZ_MAX {
             for z in 0..LEVEL_XZ_MAX {
                 for y in 0..LEVEL_Y_MAX {
-                    let is_edge =
-                        x == 0 || x == LEVEL_XZ_MAX - 1 || z == 0 || z == LEVEL_XZ_MAX - 1;
-
-                    let material = if is_edge && y <= 5 {
-                        Material::Barrier.default()
-                    } else if y == 5 {
+                    let material = if y == 5 {
                         Material::Grass.default()
                     } else if y >= 3 && y < 5 {
                         Material::Dirt.default()
