@@ -105,6 +105,7 @@ impl WorldScene {
         for LevelBlock { block, x, y, z } in &self.level.blocks {
             let color: Color = match block.material {
                 Material::Air => continue, // skip rendering air entirely
+                Material::Barrier => continue,
                 Material::Dirt => Color::DARKBROWN,
                 Material::Grass => Color::FORESTGREEN,
                 Material::Stone => Color::LIGHTSLATEGRAY,
