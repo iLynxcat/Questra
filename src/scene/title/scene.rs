@@ -1,35 +1,15 @@
-use raylib::{
-    RaylibHandle,
-    drawing::RaylibDrawHandle,
-    math::{Rectangle, Vector2},
-    rgui::RaylibDrawGui,
-};
+use raylib::{RaylibHandle, drawing::RaylibDrawHandle};
 
-pub struct TitleScene {
-    game_transition_frames: usize,
-}
+use crate::level::Level;
+
+pub struct TitleScene {}
 
 impl TitleScene {
-    pub fn new() -> Self {
-        Self {
-            game_transition_frames: 0,
-        }
+    pub fn new(_level: Level) -> Self {
+        Self {}
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle) {
-        if self.game_transition_frames > 0 {
-            if self.game_transition_frames > 60 {
-                return;
-            }
+    pub fn update(&mut self, _rl: &RaylibHandle) {}
 
-            self.game_transition_frames += 1;
-            return;
-        }
-    }
-
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
-        if d.gui_button(Rectangle::new(40.0, 20.0, 200.0, 20.0), "Play") {
-            self.game_transition_frames = 1;
-        }
-    }
+    pub fn draw(&self, _d: &mut RaylibDrawHandle) {}
 }
