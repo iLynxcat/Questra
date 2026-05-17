@@ -1,0 +1,3 @@
+0.0.x = Alpha
+0.x.x = Beta
+x.x.x = Release

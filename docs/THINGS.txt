@@ -1,0 +1,2 @@
+A "Thing" is a grouping of blocks.
+It can be duplicated and shared using a Blueprint.

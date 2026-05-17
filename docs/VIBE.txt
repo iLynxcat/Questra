@@ -1,0 +1,5 @@
+Isometric camera view
+3D cube-based world
+Discrete objects (Tree) but represented via cube-like geometry
+Isolated, solo
+Build a life from scratch

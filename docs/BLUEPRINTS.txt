@@ -1,0 +1,1 @@
+A "Blueprint" is a template for creating a "Thing".
