@@ -34,6 +34,10 @@ impl WorldScene {
     }
 
     pub fn update(&mut self, rl: &RaylibHandle) {
+        if rl.is_key_pressed(KeyboardKey::KEY_Q) {
+            self.is_frozen = !self.is_frozen;
+        }
+
         if self.is_frozen {
             return;
         }
