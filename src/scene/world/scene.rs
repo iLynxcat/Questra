@@ -21,6 +21,8 @@ pub struct WorldScene {
     level: Level,
 }
 
+const PLAYER_CAMERA_OFFSET: Vector3 = Vector3::new(45.0, 30.0, 45.0);
+
 impl WorldScene {
     pub fn new(level: Level) -> Self {
         Self {
@@ -31,7 +33,7 @@ impl WorldScene {
 
             player: Player::new(Vector3::new(0.0, 7.0, 0.0)),
             camera: Camera3D::orthographic(
-                Vector3::new(30.0, 30.0, 30.0),
+                PLAYER_CAMERA_OFFSET,
                 Vector3::new(0.0, 1.0, 0.0),
                 Vector3::new(0.0, 1.0, 0.0),
                 10.0,
@@ -112,7 +114,7 @@ impl WorldScene {
 
         self.player.update(&rl);
 
-        self.camera.position = self.player.position.add(Vector3::new(30.0, 30.0, 30.0));
+        self.camera.position = self.player.position.add(PLAYER_CAMERA_OFFSET);
         self.camera.target = self.player.position;
     }
 
