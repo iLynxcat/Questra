@@ -1,10 +1,12 @@
 use questra::{scene::Scene, state::GameState};
 use raylib::{audio::RaylibAudio, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
+const TITLE: &str = concat!("Questra ", env!("CARGO_PKG_VERSION"));
+
 fn main() {
     let (mut rl, thread) = raylib::init() //
         .size(640, 480)
-        .title("Questra")
+        .title(TITLE)
         .build();
 
     let Ok(audio) = RaylibAudio::init_audio_device() else {

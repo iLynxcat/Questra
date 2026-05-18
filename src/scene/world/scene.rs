@@ -174,13 +174,12 @@ impl WorldScene {
             drop(b);
         }
 
-        d.draw_text("Questra", 10, 10, 18, Color::WHITE);
         if self.is_showing_pause_menu {
-            d.draw_text("Pause", 10, 34, 18, Color::WHITE);
-            d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
+            d.draw_text("Pause", 10, 4, 18, Color::WHITE);
+            d.draw_text("Press Q to quit", 10, 20, 18, Color::WHITE);
         } else if self.is_frozen {
-            d.draw_text("Frozen", 10, 34, 18, Color::WHITE);
-            d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
+            d.draw_text("Frozen", 10, 4, 18, Color::WHITE);
+            d.draw_text("Press Q to quit", 10, 20, 18, Color::WHITE);
         }
 
         if let Some(text) = &self.sign_text {
