@@ -3,6 +3,7 @@ use raylib::{RaylibHandle, RaylibThread, texture::Texture2D};
 pub struct GameAssets {
     pub player_sprite: Texture2D,
     pub crosshair_sprite: Texture2D,
+    pub title_sprite: Texture2D,
 }
 
 impl GameAssets {
@@ -14,6 +15,9 @@ impl GameAssets {
             crosshair_sprite: rl
                 .load_texture(thread, "res/cursor.png")
                 .expect("Failed to load cursor sprite"),
+            title_sprite: rl
+                .load_texture(thread, "res/title.png")
+                .expect("Failed to load title sprite"),
         }
     }
 }
