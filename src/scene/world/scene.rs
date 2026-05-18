@@ -193,22 +193,8 @@ impl WorldScene {
             b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
             drop(b);
 
-            let version_line = {
-                let (x, y, z) = (
-                    self.player.position.x.floor(),
-                    self.player.position.y.floor(),
-                    self.player.position.z.floor(),
-                );
-                format!("Questra version {}", env!("CARGO_PKG_VERSION"))
-            };
-            let fps_line = {
-                let (x, y, z) = (
-                    self.player.position.x.floor(),
-                    self.player.position.y.floor(),
-                    self.player.position.z.floor(),
-                );
-                format!("{} FPS", self.fps)
-            };
+            let version_line = format!("Questra version {}", env!("CARGO_PKG_VERSION"));
+            let fps_line = format!("{} FPS", self.fps);
             let location_line = {
                 let (x, y, z) = (
                     self.player.position.x.floor(),
