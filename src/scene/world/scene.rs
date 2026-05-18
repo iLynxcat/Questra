@@ -1,22 +1,21 @@
+use std::ops::Add;
+
 use crate::{
     assets::GameAssets,
     level::{Level, LevelBlock, block::Material},
-    scene::world::block::draw_block,
+    scene::world::{block::draw_block, player::Player},
 };
 use raylib::{
     RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, ffi::KeyboardKey,
     math::Vector3, prelude::*,
 };
 
-const MOVE_SPEED: f32 = 5.0;
-
 pub struct WorldScene {
     pub is_frozen: bool,
     pub is_showing_pause_menu: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
-    rotation: f32,
-
+    player: Player,
     camera: Camera3D,
     level: Level,
 }
@@ -28,8 +27,7 @@ impl WorldScene {
             is_showing_pause_menu: false,
             hovered_block: None,
 
-            rotation: 0.0,
-
+            player: Player::new(Vector3::new(0.0, 7.0, 0.0)),
             camera: Camera3D::orthographic(
                 Vector3::new(30.0, 30.0, 30.0),
                 Vector3::new(0.0, 1.0, 0.0),
@@ -50,11 +48,6 @@ impl WorldScene {
 
         if self.is_frozen {
             return;
-        }
-
-        self.rotation += 1.0;
-        if self.rotation >= 360.0 {
-            self.rotation = 0.0;
         }
 
         let mouse = rl.get_mouse_position();
@@ -111,37 +104,10 @@ impl WorldScene {
             }
         }
 
-        let movement_delta: Vector3 = {
-            let mut x = 0.0;
-            let mut z = 0.0;
+        self.player.update(&rl);
 
-            if rl.is_key_down(KeyboardKey::KEY_W) {
-                x -= MOVE_SPEED;
-                z -= MOVE_SPEED;
-            }
-            if rl.is_key_down(KeyboardKey::KEY_S) {
-                x += MOVE_SPEED;
-                z += MOVE_SPEED;
-            }
-            if rl.is_key_down(KeyboardKey::KEY_A) {
-                x -= MOVE_SPEED;
-                z += MOVE_SPEED;
-            }
-            if rl.is_key_down(KeyboardKey::KEY_D) {
-                x += MOVE_SPEED;
-                z -= MOVE_SPEED;
-            }
-
-            let raw = Vector3::new(x, 0.0, z);
-            if raw.length() > 0.0 {
-                raw.normalized() * MOVE_SPEED * rl.get_frame_time()
-            } else {
-                raw
-            }
-        };
-
-        self.camera.position = self.camera.position + movement_delta;
-        self.camera.target = self.camera.target + movement_delta;
+        self.camera.position = self.player.position.add(Vector3::new(30.0, 30.0, 30.0));
+        self.camera.target = self.player.position;
     }
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
@@ -169,17 +135,7 @@ impl WorldScene {
             d3.draw_cube_wires(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, Color::RED);
         }
 
-        d3.draw_billboard_pro(
-            &self.camera,
-            *assets.player_sprite,
-            Rectangle::new(0.0, 0.0, 64.0, 64.0),
-            Vector3::new(0.0, 6.5, 0.0),
-            Vector3::up(),
-            Vector2::new(1.0, 1.0),
-            Vector2::zero(),
-            self.rotation,
-            Color::WHITE,
-        );
+        self.player.draw(&mut d3, &self.camera, &assets);
 
         drop(d3);
 
