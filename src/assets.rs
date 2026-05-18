@@ -4,6 +4,7 @@ pub struct GameAssets {
     pub player_sprite: Texture2D,
     pub crosshair_sprite: Texture2D,
     pub title_sprite: Texture2D,
+    pub texture_atlas: Texture2D,
 }
 
 impl GameAssets {
@@ -18,6 +19,9 @@ impl GameAssets {
             title_sprite: rl
                 .load_texture(thread, "res/title.png")
                 .expect("Failed to load title sprite"),
+            texture_atlas: rl
+                .load_texture(thread, "res/atlas.png")
+                .expect("Failed to load texture atlas"),
         }
     }
 }

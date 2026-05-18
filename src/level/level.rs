@@ -1,29 +1,29 @@
+use std::collections::HashMap;
+
 use crate::level::block::{Block, Material};
 
 pub struct Level {
-    pub blocks: Vec<LevelBlock>,
+    pub blocks: HashMap<(i32, i32, i32), Block>,
 }
 
-#[derive(Debug)]
-pub struct LevelBlock {
-    pub x: i32,
-    pub y: i32,
-    pub z: i32,
-    pub block: Block,
-}
-
-const LEVEL_XZ_MAX: i32 = 32;
-const LEVEL_Y_MAX: i32 = 32;
+pub const LEVEL_XZ_MIN: i32 = -32;
+pub const LEVEL_XZ_MAX: i32 = 32;
+pub const LEVEL_Y_MIN: i32 = 0;
+pub const LEVEL_Y_MAX: i32 = 32;
 const LEVEL_Y_SURFACE: i32 = 12;
 const LEVEL_TOTAL_BLOCKS: usize = (LEVEL_XZ_MAX * LEVEL_XZ_MAX * LEVEL_Y_MAX) as usize;
 
 impl Level {
     pub fn new() -> Self {
-        let mut blocks = Vec::with_capacity(LEVEL_TOTAL_BLOCKS);
-        for x in 0..LEVEL_XZ_MAX {
-            for z in 0..LEVEL_XZ_MAX {
-                for y in 0..LEVEL_Y_MAX {
-                    let material = if y == 0 {
+        let mut blocks: HashMap<(i32, i32, i32), Block> =
+            HashMap::with_capacity(LEVEL_TOTAL_BLOCKS);
+
+        // WORLD GENERATION
+
+        for x in LEVEL_XZ_MIN..LEVEL_XZ_MAX {
+            for z in LEVEL_XZ_MIN..LEVEL_XZ_MAX {
+                for y in LEVEL_Y_MIN..LEVEL_Y_MAX {
+                    let block = if y == 0 {
                         Material::Barrier.default()
                     } else if y < LEVEL_Y_SURFACE - 3 {
                         Material::Stone.default()
@@ -35,16 +35,18 @@ impl Level {
                         Material::Air.default()
                     };
 
-                    blocks.push(LevelBlock {
-                        x,
-                        y,
-                        z,
-                        block: material,
-                    })
+                    blocks.insert((x, y, z), block);
                 }
             }
         }
 
         Self { blocks }
+    }
+
+    pub fn to_material_map(&self) -> HashMap<(i32, i32, i32), Material> {
+        self.blocks
+            .iter()
+            .map(|(&(x, y, z), block)| ((x, y, z), block.material))
+            .collect()
     }
 }
