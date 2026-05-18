@@ -6,7 +6,11 @@ use raylib::{
     math::{Rectangle, Vector2, Vector3},
 };
 
-use crate::{assets::GameAssets, scene::world::camera::Camera};
+use crate::{
+    assets::GameAssets,
+    level::{LEVEL_XZ_MAX, LEVEL_XZ_MIN, LEVEL_Y_MIN},
+    scene::world::camera::Camera,
+};
 
 const MOVE_SPEED: f32 = 5.0;
 
@@ -26,7 +30,16 @@ impl Player {
 
     pub fn update(&mut self, rl: &RaylibHandle) {
         let movement = get_movement_delta(&rl);
-        self.position = self.position.add(movement);
+        self.position += movement;
+
+        let min_xz = LEVEL_XZ_MIN as f32;
+        let max_xz = LEVEL_XZ_MAX as f32;
+        let min_y = LEVEL_Y_MIN as f32;
+
+        self.position.x = self.position.x.clamp(min_xz, max_xz);
+        self.position.z = self.position.z.clamp(min_xz, max_xz);
+        self.position.y = self.position.y.max(min_y);
+
         if movement.length() > 0.01 {
             self.walk_animation_frame = if self.walk_animation_frame > 8 {
                 0
