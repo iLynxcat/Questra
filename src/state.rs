@@ -20,7 +20,7 @@ impl GameState {
             scene: Scene::World(WorldScene::new(level)),
             assets: GameAssets::load(rl, thread),
 
-            is_music_paused: true,
+            is_music_paused: cfg!(debug_assertions),
         }
     }
 }
