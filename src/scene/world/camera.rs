@@ -64,11 +64,11 @@ impl Camera {
 
     pub fn update(&mut self) {
         if (self.position_destination - self.position).length() > 0.001 {
-            self.position = lerp(self.position, self.position_destination, 10.0);
+            self.position = lerp(self.position, self.position_destination, 5.0);
         }
 
         if (self.target_destination - self.target).length() > 0.001 {
-            self.target = lerp(self.target, self.target_destination, 10.0);
+            self.target = lerp(self.target, self.target_destination, 5.0);
         }
 
         if f32::abs(self.fovy_destination - self.fovy) > 0.001 {
