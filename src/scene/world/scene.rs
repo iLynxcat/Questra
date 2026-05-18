@@ -114,8 +114,7 @@ impl WorldScene {
                     .iter_mut()
                     .find(|b| b.x == x && b.y == y && b.z == z)
                 {
-                    block.block = Material::Sign.default();
-                    block.block.state = BlockState::Sign("hewwo ^w^".to_string());
+                    block.block = Material::Stone.default();
                 }
             }
         }
