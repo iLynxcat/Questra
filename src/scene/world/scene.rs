@@ -21,8 +21,9 @@ const ZOOM_FOVY_DEFAULT: f32 = 15.0;
 const ZOOM_FOVY_MAX: f32 = 30.0;
 const ZOOM_FOVY_INCREMENT: f32 = 5.0;
 
-const HELP_TEXTS: [&'static str; 6] = [
+const HELP_TEXTS: [&'static str; 7] = [
     "Z = debug",
+    "X = toggle wireframe",
     "[ = zoom out",
     "] = zoom in",
     "M = toggle mute",
@@ -31,10 +32,11 @@ const HELP_TEXTS: [&'static str; 6] = [
 ];
 
 pub struct WorldScene {
-    pub is_frozen: bool,
-    pub is_showing_pause_menu: bool,
-    pub is_showing_debug: bool,
-    pub hovered_block: Option<(i32, i32, i32, Vector3)>,
+    is_frozen: bool,
+    is_showing_pause_menu: bool,
+    is_showing_debug: bool,
+    is_showing_wireframe: bool,
+    hovered_block: Option<(i32, i32, i32, Vector3)>,
 
     fps: u32,
 
@@ -53,6 +55,7 @@ impl WorldScene {
             is_frozen: false,
             is_showing_pause_menu: false,
             is_showing_debug: false,
+            is_showing_wireframe: false,
             hovered_block: None,
 
             fps: 0,
@@ -156,6 +159,9 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_Z) {
             self.is_showing_debug = !self.is_showing_debug;
         }
+        if rl.is_key_pressed(KeyboardKey::KEY_X) {
+            self.is_showing_wireframe = !self.is_showing_wireframe;
+        }
         if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET) && self.camera.fovy < ZOOM_FOVY_MAX {
             self.camera.fovy += ZOOM_FOVY_INCREMENT;
         }
@@ -232,21 +238,23 @@ impl WorldScene {
 
         if let Some(model) = self.level_mesh {
             unsafe {
-                ffi::DrawModel(
-                    model,
-                    ffi::Vector3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    1.0,
-                    ffi::Color {
-                        r: 255,
-                        g: 255,
-                        b: 255,
-                        a: 255,
-                    },
-                );
+                let pos = ffi::Vector3 {
+                    x: 0.0,
+                    y: 0.0,
+                    z: 0.0,
+                };
+                let white = ffi::Color {
+                    r: 255,
+                    g: 255,
+                    b: 255,
+                    a: 255,
+                };
+
+                if self.is_showing_wireframe {
+                    ffi::DrawModelWires(model, pos, 1.0, white);
+                } else {
+                    ffi::DrawModel(model, pos, 1.0, white);
+                }
             }
         }
     }
