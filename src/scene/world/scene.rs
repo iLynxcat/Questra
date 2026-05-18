@@ -126,7 +126,7 @@ impl WorldScene {
         self.player.update(&rl);
 
         self.camera.position = self.player.position.add(PLAYER_CAMERA_OFFSET);
-        self.camera.target = self.player.position;
+        self.camera.target = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
     }
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
