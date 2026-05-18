@@ -29,6 +29,11 @@ pub struct WorldScene {
 
 const PLAYER_CAMERA_OFFSET: Vector3 = Vector3::new(45.0, 30.0, 45.0);
 
+const ZOOM_FOVY_MIN: f32 = 5.0;
+const ZOOM_FOVY_DEFAULT: f32 = 15.0;
+const ZOOM_FOVY_MAX: f32 = 30.0;
+const ZOOM_FOVY_INCREMENT: f32 = 5.0;
+
 impl WorldScene {
     pub fn new(level: Level) -> Self {
         Self {
@@ -45,7 +50,7 @@ impl WorldScene {
                 PLAYER_CAMERA_OFFSET,
                 Vector3::new(0.0, 1.0, 0.0),
                 Vector3::new(0.0, 1.0, 0.0),
-                10.0,
+                ZOOM_FOVY_DEFAULT,
             ),
             level,
         }
@@ -126,6 +131,11 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_Z) {
             self.is_showing_debug = !self.is_showing_debug;
         }
+        if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET) && self.camera.fovy < ZOOM_FOVY_MAX {
+            self.camera.fovy += ZOOM_FOVY_INCREMENT;
+        }
+        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET) && self.camera.fovy > ZOOM_FOVY_MIN {
+            self.camera.fovy -= ZOOM_FOVY_INCREMENT;
         }
 
         self.player.update(&rl);
