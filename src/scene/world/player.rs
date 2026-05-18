@@ -2,14 +2,13 @@ use std::ops::Add;
 
 use raylib::{
     RaylibHandle,
-    camera::Camera3D,
     color::Color,
     drawing::{RaylibDraw3D, RaylibDrawHandle, RaylibMode3D},
     ffi::KeyboardKey,
     math::{Rectangle, Vector2, Vector3},
 };
 
-use crate::assets::GameAssets;
+use crate::{assets::GameAssets, scene::world::camera::Camera};
 
 const MOVE_SPEED: f32 = 5.0;
 
@@ -27,14 +26,9 @@ impl Player {
         self.position = self.position.add(movement);
     }
 
-    pub fn draw(
-        &self,
-        d3: &mut RaylibMode3D<RaylibDrawHandle>,
-        cam: &Camera3D,
-        assets: &GameAssets,
-    ) {
+    pub fn draw(&self, d3: &mut RaylibMode3D<RaylibDrawHandle>, cam: &Camera, assets: &GameAssets) {
         d3.draw_billboard_pro(
-            cam,
+            cam.raycam,
             *assets.player_sprite,
             Rectangle::new(0.0, 0.0, 64.0, 64.0),
             self.position,

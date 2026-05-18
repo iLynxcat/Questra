@@ -1,4 +1,10 @@
-use std::fmt::Display;
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Sub},
+    path::absolute,
+};
+
+use raylib::{camera::Camera3D, math::Vector3};
 
 pub enum CameraDirection {
     PlusXPlusZ = 0,
@@ -27,4 +33,58 @@ impl Display for CameraDirection {
             Self::MinusXPlusZ => "-x +z",
         })
     }
+}
+
+pub struct Camera {
+    pub raycam: Camera3D,
+
+    position: Vector3,
+    target: Vector3,
+    fovy: f32,
+
+    pub direction: CameraDirection,
+
+    pub position_destination: Vector3,
+    pub target_destination: Vector3,
+    pub fovy_destination: f32,
+}
+
+impl Camera {
+    pub fn new(position: Vector3, target: Vector3, direction: CameraDirection, fovy: f32) -> Self {
+        Self {
+            raycam: Camera3D::perspective(position, target, Vector3::up(), fovy),
+            position,
+            target,
+            direction,
+            fovy,
+            position_destination: position,
+            target_destination: target,
+            fovy_destination: fovy,
+        }
+    }
+
+    pub fn update(&mut self) {
+        if (self.position_destination - self.position).length() > 0.001 {
+            self.position = lerp(self.position, self.position_destination, 10.0);
+        }
+
+        if (self.target_destination - self.target).length() > 0.001 {
+            self.target = lerp(self.target, self.target_destination, 10.0);
+        }
+
+        if f32::abs(self.fovy_destination - self.fovy) > 0.001 {
+            self.fovy = lerp(self.fovy, self.fovy_destination, 10.0)
+        }
+
+        self.raycam.position = self.position;
+        self.raycam.target = self.target;
+        self.raycam.fovy = self.fovy;
+    }
+}
+
+fn lerp<T>(current: T, target: T, factor: f32) -> T
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Div<f32, Output = T>,
+{
+    current + (target - current) / factor
 }

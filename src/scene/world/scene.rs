@@ -6,12 +6,25 @@ use crate::{
         Level,
         block::{Block, BlockState, Material},
     },
-    scene::world::{build_mesh, camera::CameraDirection, make_model, player::Player, upload_mesh},
+    scene::world::{
+        build_mesh,
+        camera::{Camera, CameraDirection},
+        make_model,
+        player::Player,
+        upload_mesh,
+    },
 };
 use raylib::{
-    RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, math::Vector3,
-    prelude::*,
+    RaylibHandle,
+    color::Color,
+    drawing::{
+        RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3D,
+        RaylibMode3DExt,
+    },
+    ffi,
+    math::{BoundingBox, Vector3},
 };
+use raylib_sys::{BlendMode, KeyboardKey, MouseButton};
 
 const PLAYER_CAMERA_OFFSET_XZ: f32 = 45.0;
 const PLAYER_CAMERA_OFFSET_Y: f32 = 15.0;
@@ -42,8 +55,7 @@ pub struct WorldScene {
 
     sign_text: Option<String>,
     player: Player,
-    camera: Camera3D,
-    camera_direction: CameraDirection,
+    camera: Camera,
     level: Level,
     level_mesh: Option<ffi::Model>,
     level_mesh_is_dirty: bool,
@@ -62,17 +74,16 @@ impl WorldScene {
 
             sign_text: None,
             player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
-            camera: Camera3D::perspective(
+            camera: Camera::new(
                 Vector3::new(
                     PLAYER_CAMERA_OFFSET_XZ,
                     PLAYER_CAMERA_OFFSET_Y,
                     PLAYER_CAMERA_OFFSET_XZ,
                 ),
                 Vector3::new(0.0, 1.0, 0.0),
-                Vector3::new(0.0, 1.0, 0.0),
+                CameraDirection::PlusXPlusZ,
                 ZOOM_FOVY_DEFAULT,
             ),
-            camera_direction: CameraDirection::PlusXPlusZ,
             level,
             level_mesh: None,
             level_mesh_is_dirty: true,
@@ -92,7 +103,7 @@ impl WorldScene {
         }
 
         let mouse = rl.get_mouse_position();
-        let ray = rl.get_screen_to_world_ray(mouse, self.camera);
+        let ray = rl.get_screen_to_world_ray(mouse, self.camera.raycam);
 
         let mut targeted_block: Option<(f32, (i32, i32, i32), &Block, Vector3)> = None;
 
@@ -162,41 +173,47 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_X) {
             self.is_showing_wireframe = !self.is_showing_wireframe;
         }
-        if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET) && self.camera.fovy < ZOOM_FOVY_MAX {
-            self.camera.fovy += ZOOM_FOVY_INCREMENT;
+        if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET)
+            && self.camera.fovy_destination < ZOOM_FOVY_MAX
+        {
+            self.camera.fovy_destination += ZOOM_FOVY_INCREMENT;
         }
-        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET) && self.camera.fovy > ZOOM_FOVY_MIN {
-            self.camera.fovy -= ZOOM_FOVY_INCREMENT;
+        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET)
+            && self.camera.fovy_destination > ZOOM_FOVY_MIN
+        {
+            self.camera.fovy_destination -= ZOOM_FOVY_INCREMENT;
         }
         if rl.is_key_pressed(KeyboardKey::KEY_V) {
-            self.camera_direction = self.camera_direction.get_next()
+            self.camera.direction = self.camera.direction.get_next()
         }
 
         self.player.update(&rl);
         self.fps = rl.get_fps();
 
-        self.camera.position = self.player.position.add(Vector3::new(
-            match self.camera_direction {
+        self.camera.position_destination = self.player.position.add(Vector3::new(
+            match self.camera.direction {
                 CameraDirection::PlusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::PlusXMinusZ => PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::MinusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::MinusXPlusZ => -PLAYER_CAMERA_OFFSET_XZ,
             },
             PLAYER_CAMERA_OFFSET_Y,
-            match self.camera_direction {
+            match self.camera.direction {
                 CameraDirection::PlusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::MinusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::MinusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
                 CameraDirection::PlusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
             },
         ));
-        self.camera.target = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
+        self.camera.target_destination = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
+
+        self.camera.update();
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::SKYBLUE);
 
-        let mut d3 = d.begin_mode3D(&self.camera);
+        let mut d3 = d.begin_mode3D(&self.camera.raycam);
 
         self.draw_world_mesh(&mut d3, &assets);
 
@@ -285,7 +302,7 @@ impl WorldScene {
     fn draw_debug_text(&self, d: &mut RaylibDrawHandle) {
         let version_line = format!("Questra Alpha {}", env!("CARGO_PKG_VERSION_PATCH"));
         let fps_line = format!("{} FPS", self.fps);
-        let direction_line = format!("Facing: {}", self.camera_direction);
+        let direction_line = format!("Facing: {}", self.camera.direction);
         let location_line = {
             let (x, y, z) = (
                 self.player.position.x.floor(),
