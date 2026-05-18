@@ -7,6 +7,7 @@ pub enum Material {
     Dirt = 2,
     Grass = 3,
     Stone = 4,
+    Sign = 15,
 }
 
 impl Material {
@@ -17,6 +18,7 @@ impl Material {
             Material::Dirt => Block::new(self, BlockState::None),
             Material::Grass => Block::new(self, BlockState::None),
             Material::Stone => Block::new(self, BlockState::None),
+            Material::Sign => Block::new(self, BlockState::Sign("".to_string())),
         }
     }
 }

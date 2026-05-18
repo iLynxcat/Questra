@@ -2,7 +2,10 @@ use std::ops::Add;
 
 use crate::{
     assets::GameAssets,
-    level::{Level, LevelBlock, block::Material},
+    level::{
+        Level, LevelBlock,
+        block::{BlockState, Material},
+    },
     scene::world::{block::draw_block, player::Player},
 };
 use raylib::{
@@ -16,6 +19,7 @@ pub struct WorldScene {
     pub is_showing_cursor: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
+    sign_text: Option<String>,
     player: Player,
     camera: Camera3D,
     level: Level,
@@ -31,6 +35,7 @@ impl WorldScene {
             is_showing_cursor: false,
             hovered_block: None,
 
+            sign_text: None,
             player: Player::new(Vector3::new(0.0, 7.0, 0.0)),
             camera: Camera3D::orthographic(
                 PLAYER_CAMERA_OFFSET,
@@ -79,8 +84,14 @@ impl WorldScene {
 
         if let Some((_, block, normal)) = targeted_block {
             self.hovered_block = Some((block.x, block.y, block.z, normal));
+            self.sign_text = if let BlockState::Sign(text) = &block.block.state {
+                Some(text.to_string())
+            } else {
+                None
+            };
         } else {
             self.hovered_block = None;
+            self.sign_text = None;
         }
 
         if let Some((x, y, z, normal)) = self.hovered_block {
@@ -103,7 +114,8 @@ impl WorldScene {
                     .iter_mut()
                     .find(|b| b.x == x && b.y == y && b.z == z)
                 {
-                    block.block = Material::Stone.default();
+                    block.block = Material::Sign.default();
+                    block.block.state = BlockState::Sign("hewwo ^w^".to_string());
                 }
             }
         }
@@ -130,6 +142,7 @@ impl WorldScene {
                 Material::Dirt => Color::DARKBROWN,
                 Material::Grass => Color::FORESTGREEN,
                 Material::Stone => Color::LIGHTSLATEGRAY,
+                Material::Sign => Color::DARKBLUE,
             };
 
             let (x, y, z) = (*x as f32, *y as f32, *z as f32);
@@ -168,6 +181,11 @@ impl WorldScene {
         } else if self.is_frozen {
             d.draw_text("Frozen", 10, 34, 18, Color::WHITE);
             d.draw_text("Press Q to quit", 10, 50, 18, Color::WHITE);
+        }
+
+        if let Some(text) = &self.sign_text {
+            d.draw_text(&text, 15, 132, 18, Color::BLACK.alpha(0.5));
+            d.draw_text(&text, 10, 128, 18, Color::WHITE);
         }
     }
 }
