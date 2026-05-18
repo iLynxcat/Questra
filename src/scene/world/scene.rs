@@ -209,7 +209,7 @@ impl WorldScene {
         ));
         self.camera.target_destination = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
 
-        self.camera.update();
+        self.camera.update(&rl);
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {

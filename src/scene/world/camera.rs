@@ -1,9 +1,8 @@
-use std::{
-    fmt::Display,
-    ops::{Add, Div, Sub},
-};
+use std::fmt::Display;
 
-use raylib::{camera::Camera3D, math::Vector3};
+use raylib::{RaylibHandle, camera::Camera3D, math::Vector3};
+
+use crate::scene::render::lerp_smooth;
 
 pub enum CameraDirection {
     PlusXPlusZ = 0,
@@ -62,28 +61,31 @@ impl Camera {
         }
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, rl: &RaylibHandle) {
         if (self.position_destination - self.position).length() > 0.001 {
-            self.position = lerp(self.position, self.position_destination, 5.0);
+            self.position = lerp_smooth(
+                self.position,
+                self.position_destination,
+                0.25,
+                rl.get_frame_time(),
+            );
         }
 
         if (self.target_destination - self.target).length() > 0.001 {
-            self.target = lerp(self.target, self.target_destination, 5.0);
+            self.target = lerp_smooth(
+                self.target,
+                self.target_destination,
+                0.25,
+                rl.get_frame_time(),
+            );
         }
 
         if f32::abs(self.fovy_destination - self.fovy) > 0.001 {
-            self.fovy = lerp(self.fovy, self.fovy_destination, 10.0)
+            self.fovy = lerp_smooth(self.fovy, self.fovy_destination, 0.15, rl.get_frame_time())
         }
 
         self.raycam.position = self.position;
         self.raycam.target = self.target;
         self.raycam.fovy = self.fovy;
     }
-}
-
-fn lerp<T>(current: T, target: T, factor: f32) -> T
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Div<f32, Output = T>,
-{
-    current + (target - current) / factor
 }
