@@ -13,11 +13,14 @@ use crate::{
 };
 
 const MOVE_SPEED: f32 = 5.0;
+const SPRITE_SIZE: f32 = 64.0;
+const MOVE_ANIM_FPS: f32 = 15.0;
 
 pub struct Player {
     pub position: Vector3,
 
     walk_animation_frame: i32,
+    walk_animation_timer: f32,
 }
 
 impl Player {
@@ -25,6 +28,7 @@ impl Player {
         Self {
             position,
             walk_animation_frame: 0,
+            walk_animation_timer: 0.0,
         }
     }
 
@@ -40,14 +44,18 @@ impl Player {
         self.position.z = self.position.z.clamp(min_xz, max_xz);
         self.position.y = self.position.y.max(min_y);
 
-        if movement.length() > 0.01 {
-            self.walk_animation_frame = if self.walk_animation_frame > 8 {
-                0
+        self.walk_animation_timer += rl.get_frame_time();
+        if self.walk_animation_timer >= 1.0 / MOVE_ANIM_FPS {
+            self.walk_animation_timer = 0.0;
+            if movement.length() > 0.01 {
+                self.walk_animation_frame = if self.walk_animation_frame > 8 {
+                    0
+                } else {
+                    self.walk_animation_frame + 1
+                };
             } else {
-                self.walk_animation_frame + 1
-            };
-        } else {
-            self.walk_animation_frame = 0;
+                self.walk_animation_frame = 0;
+            }
         }
     }
 
@@ -67,8 +75,6 @@ impl Player {
         );
     }
 }
-
-const SPRITE_SIZE: f32 = 64.0;
 
 fn get_movement_delta(rl: &RaylibHandle) -> Vector3 {
     let mut x = 0.0;
