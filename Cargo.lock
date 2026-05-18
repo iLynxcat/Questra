@@ -183,6 +183,7 @@ name = "questra"
 version = "0.0.5"
 dependencies = [
  "raylib",
+ "raylib-sys",
 ]
 
 [[package]]

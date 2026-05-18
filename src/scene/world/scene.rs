@@ -13,6 +13,7 @@ use raylib::{
 pub struct WorldScene {
     pub is_frozen: bool,
     pub is_showing_pause_menu: bool,
+    pub is_showing_cursor: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
 
     player: Player,
@@ -25,6 +26,7 @@ impl WorldScene {
         Self {
             is_frozen: false,
             is_showing_pause_menu: false,
+            is_showing_cursor: false,
             hovered_block: None,
 
             player: Player::new(Vector3::new(0.0, 7.0, 0.0)),
@@ -104,6 +106,10 @@ impl WorldScene {
             }
         }
 
+        if rl.is_key_pressed(KeyboardKey::KEY_C) {
+            self.is_showing_cursor = !self.is_showing_cursor;
+        }
+
         self.player.update(&rl);
 
         self.camera.position = self.player.position.add(Vector3::new(30.0, 30.0, 30.0));
@@ -139,16 +145,19 @@ impl WorldScene {
 
         drop(d3);
 
-        // let mut b = d.begin_blend_mode(BlendMode::BLEND_CUSTOM);
-        // unsafe {
-        //     raylib_sys::rlSetBlendFactors(
-        //         RL_ONE_MINUS_DST_COLOR as i32,
-        //         RL_ONE_MINUS_SRC_ALPHA as i32,
-        //         RL_FUNC_ADD as i32,
-        //     );
-        // }
-        // b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
-        // drop(b);
+        if self.is_showing_cursor {
+            let mut b = d.begin_blend_mode(BlendMode::BLEND_CUSTOM);
+            unsafe {
+                raylib_sys::rlSetBlendFactors(
+                    ffi::RL_ONE_MINUS_DST_COLOR as i32,
+                    ffi::RL_ONE_MINUS_SRC_ALPHA as i32,
+                    ffi::RL_FUNC_ADD as i32,
+                );
+            }
+
+            b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
+            drop(b);
+        }
 
         d.draw_text("Questra", 10, 10, 18, Color::WHITE);
         if self.is_showing_pause_menu {
