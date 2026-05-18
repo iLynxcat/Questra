@@ -2,6 +2,7 @@ use questra::{scene::Scene, state::GameState};
 use raylib::{audio::RaylibAudio, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
 const TITLE: &str = concat!("Questra Alpha ", env!("CARGO_PKG_VERSION_PATCH"));
+const SOUNDTRACK: &str = concat!("res/music/lamentable.mp3");
 
 fn main() {
     let (mut rl, thread) = raylib::init() //
@@ -14,7 +15,7 @@ fn main() {
     };
 
     audio.set_master_volume(0.3);
-    let Ok(mut music) = audio.new_music("res/music/tdhr-summer-night-feast-2025.mp3") else {
+    let Ok(mut music) = audio.new_music(SOUNDTRACK) else {
         panic!("failed to load music!")
     };
 
