@@ -69,7 +69,7 @@ pub fn build_mesh(world: &HashMap<(i32, i32, i32), Material>) -> MeshData {
     let mut data = MeshData::default();
 
     for (&(x, y, z), &material) in world {
-        if material == Material::Air {
+        if material == Material::Air || material == Material::Barrier {
             continue;
         }
 
