@@ -63,6 +63,8 @@ pub struct WorldScene {
 
 impl WorldScene {
     pub fn new(level: Level) -> Self {
+        let player_position = Vector3::new(0.0, 13.0, 0.0);
+
         Self {
             is_frozen: false,
             is_showing_pause_menu: false,
@@ -73,14 +75,14 @@ impl WorldScene {
             fps: 0,
 
             sign_text: None,
-            player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
+            player: Player::new(player_position),
             camera: Camera::new(
                 Vector3::new(
                     PLAYER_CAMERA_OFFSET_XZ,
                     PLAYER_CAMERA_OFFSET_Y,
                     PLAYER_CAMERA_OFFSET_XZ,
-                ),
-                Vector3::new(0.0, 1.0, 0.0),
+                ) + player_position,
+                player_position,
                 CameraDirection::PlusXPlusZ,
                 ZOOM_FOVY_DEFAULT,
             ),
