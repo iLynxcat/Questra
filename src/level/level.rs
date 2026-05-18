@@ -6,10 +6,10 @@ pub struct Level {
     pub blocks: HashMap<(i32, i32, i32), Block>,
 }
 
-pub const LEVEL_XZ_MIN: i32 = -32;
-pub const LEVEL_XZ_MAX: i32 = 32;
+pub const LEVEL_XZ_MIN: i32 = -8;
+pub const LEVEL_XZ_MAX: i32 = 8;
 pub const LEVEL_Y_MIN: i32 = 0;
-pub const LEVEL_Y_MAX: i32 = 32;
+pub const LEVEL_Y_MAX: i32 = 127;
 const LEVEL_Y_SURFACE: i32 = 12;
 const LEVEL_TOTAL_BLOCKS: usize = (LEVEL_XZ_MAX * LEVEL_XZ_MAX * LEVEL_Y_MAX) as usize;
 
