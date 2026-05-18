@@ -28,7 +28,7 @@ fn main() {
 
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
-            state.is_muted = !state.is_muted;
+            state.is_music_paused = !state.is_music_paused;
         }
 
         let mut d = rl.begin_drawing(&thread);
@@ -44,11 +44,14 @@ fn main() {
             }
         }
 
-        if state.is_muted {
-            music.set_volume(0.0);
-            d.draw_text("Mute", 10, 460, 18, Color::RED);
-        } else {
-            music.set_volume(1.0);
+        if state.is_music_paused {
+            d.draw_text("Music Paused", 10, 460, 18, Color::GOLDENROD);
+
+            if music.is_stream_playing() {
+                music.pause_stream();
+            }
+        } else if !state.is_music_paused && !music.is_stream_playing() {
+            music.play_stream();
         }
 
         music.update_stream();

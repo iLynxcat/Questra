@@ -9,7 +9,7 @@ pub struct GameState {
     pub scene: Scene,
     pub assets: GameAssets,
 
-    pub is_muted: bool,
+    pub is_music_paused: bool,
 }
 
 impl GameState {
@@ -20,7 +20,7 @@ impl GameState {
             scene: Scene::World(WorldScene::new(level)),
             assets: GameAssets::load(rl, thread),
 
-            is_muted: true,
+            is_music_paused: true,
         }
     }
 }
