@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::{fmt::Display, ops::Add};
 
 use crate::{
     assets::GameAssets,
@@ -9,9 +9,38 @@ use crate::{
     scene::world::{block::draw_block, player::Player},
 };
 use raylib::{
-    RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, ffi::KeyboardKey,
-    math::Vector3, prelude::*,
+    RaylibHandle, camera::Camera3D, color::Color, drawing::RaylibDrawHandle, math::Vector3,
+    prelude::*,
 };
+
+enum CameraDirection {
+    PlusXPlusZ = 0,
+    MinusXPlusZ = 1,
+    MinusXMinusZ = 2,
+    PlusXMinusZ = 3,
+}
+
+impl CameraDirection {
+    fn get_next(&self) -> Self {
+        match self {
+            Self::PlusXPlusZ => Self::MinusXPlusZ,
+            Self::MinusXPlusZ => Self::MinusXMinusZ,
+            Self::MinusXMinusZ => Self::PlusXMinusZ,
+            Self::PlusXMinusZ => Self::PlusXPlusZ,
+        }
+    }
+}
+
+impl Display for CameraDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::PlusXPlusZ => "+x +z",
+            Self::PlusXMinusZ => "+x -z",
+            Self::MinusXMinusZ => "-x -z",
+            Self::MinusXPlusZ => "-x +z",
+        })
+    }
+}
 
 pub struct WorldScene {
     pub is_frozen: bool,
@@ -24,21 +53,24 @@ pub struct WorldScene {
     sign_text: Option<String>,
     player: Player,
     camera: Camera3D,
+    camera_direction: CameraDirection,
     level: Level,
 }
 
-const PLAYER_CAMERA_OFFSET: Vector3 = Vector3::new(45.0, 30.0, 45.0);
+const PLAYER_CAMERA_OFFSET_XZ: f32 = 45.0;
+const PLAYER_CAMERA_OFFSET_Y: f32 = 30.0;
 
 const ZOOM_FOVY_MIN: f32 = 5.0;
 const ZOOM_FOVY_DEFAULT: f32 = 15.0;
 const ZOOM_FOVY_MAX: f32 = 30.0;
 const ZOOM_FOVY_INCREMENT: f32 = 5.0;
 
-const HELP_TEXTS: [&'static str; 5] = [
+const HELP_TEXTS: [&'static str; 6] = [
     "Z = debug",
     "[ = zoom out",
     "] = zoom in",
     "M = toggle mute",
+    "V = switch view",
     "Q = quit",
 ];
 
@@ -55,11 +87,16 @@ impl WorldScene {
             sign_text: None,
             player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
             camera: Camera3D::orthographic(
-                PLAYER_CAMERA_OFFSET,
+                Vector3::new(
+                    PLAYER_CAMERA_OFFSET_XZ,
+                    PLAYER_CAMERA_OFFSET_Y,
+                    PLAYER_CAMERA_OFFSET_XZ,
+                ),
                 Vector3::new(0.0, 1.0, 0.0),
                 Vector3::new(0.0, 1.0, 0.0),
                 ZOOM_FOVY_DEFAULT,
             ),
+            camera_direction: CameraDirection::PlusXPlusZ,
             level,
         }
     }
@@ -142,11 +179,28 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET) && self.camera.fovy > ZOOM_FOVY_MIN {
             self.camera.fovy -= ZOOM_FOVY_INCREMENT;
         }
+        if rl.is_key_pressed(KeyboardKey::KEY_V) {
+            self.camera_direction = self.camera_direction.get_next()
+        }
 
         self.player.update(&rl);
         self.fps = rl.get_fps();
 
-        self.camera.position = self.player.position.add(PLAYER_CAMERA_OFFSET);
+        self.camera.position = self.player.position.add(Vector3::new(
+            match self.camera_direction {
+                CameraDirection::PlusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::PlusXMinusZ => PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::MinusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::MinusXPlusZ => -PLAYER_CAMERA_OFFSET_XZ,
+            },
+            PLAYER_CAMERA_OFFSET_Y,
+            match self.camera_direction {
+                CameraDirection::PlusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::MinusXPlusZ => PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::MinusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
+                CameraDirection::PlusXMinusZ => -PLAYER_CAMERA_OFFSET_XZ,
+            },
+        ));
         self.camera.target = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
     }
 
@@ -195,6 +249,7 @@ impl WorldScene {
 
             let version_line = format!("Questra version {}", env!("CARGO_PKG_VERSION"));
             let fps_line = format!("{} FPS", self.fps);
+            let direction_line = format!("Facing: {}", self.camera_direction);
             let location_line = {
                 let (x, y, z) = (
                     self.player.position.x.floor(),
@@ -207,11 +262,17 @@ impl WorldScene {
                 .hovered_block
                 .map(|(x, y, z, ..)| format!("Hover {} {} {}", x, y, z));
 
-            d.draw_text(&version_line, 128, 4, 18, Color::WHITE);
-            d.draw_text(&fps_line, 128, 20, 18, Color::WHITE);
-            d.draw_text(&location_line, 128, 36, 18, Color::WHITE);
+            let mut next_y = 4;
+            d.draw_text(&version_line, 128, next_y, 18, Color::WHITE);
+            next_y += 16;
+            d.draw_text(&fps_line, 128, next_y, 18, Color::WHITE);
+            next_y += 16;
+            d.draw_text(&location_line, 128, next_y, 18, Color::WHITE);
+            next_y += 16;
+            d.draw_text(&direction_line, 128, next_y, 18, Color::WHITE);
             if let Some(hovering_line) = hovering_line {
-                d.draw_text(&hovering_line, 128, 52, 18, Color::WHITE);
+                next_y += 16;
+                d.draw_text(&hovering_line, 128, next_y, 18, Color::WHITE);
             }
         }
 
