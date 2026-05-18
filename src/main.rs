@@ -1,7 +1,7 @@
 use questra::{scene::Scene, state::GameState};
 use raylib::{audio::RaylibAudio, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
-const TITLE: &str = concat!("Questra ", env!("CARGO_PKG_VERSION"));
+const TITLE: &str = concat!("Questra Alpha ", env!("CARGO_PKG_VERSION_PATCH"));
 
 fn main() {
     let (mut rl, thread) = raylib::init() //

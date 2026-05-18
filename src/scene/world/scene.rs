@@ -275,7 +275,7 @@ impl WorldScene {
     }
 
     fn draw_debug_text(&self, d: &mut RaylibDrawHandle) {
-        let version_line = format!("Questra version {}", env!("CARGO_PKG_VERSION"));
+        let version_line = format!("Questra Alpha {}", env!("CARGO_PKG_VERSION_PATCH"));
         let fps_line = format!("{} FPS", self.fps);
         let direction_line = format!("Facing: {}", self.camera_direction);
         let location_line = {
