@@ -39,8 +39,8 @@ impl Player {
             Rectangle::new(0.0, 0.0, 64.0, 64.0),
             self.position,
             Vector3::up(),
-            Vector2::new(64.0, 64.0),
-            Vector2::new(0.0, 0.0),
+            Vector2::new(2.0, 2.0),
+            Vector2::new(1.0, 0.0),
             0.0,
             Color::WHITESMOKE,
         );
