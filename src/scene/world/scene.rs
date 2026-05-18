@@ -113,12 +113,9 @@ impl WorldScene {
 
         if let Some((x, y, z, normal)) = self.hovered_block {
             if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
-                if let Some(block) = self
-                    .level
-                    .blocks
-                    .iter_mut()
-                    .find(|b| b.x == x && b.y == y && b.z == z)
-                {
+                if let Some(block) = self.level.blocks.iter_mut().find(|b| {
+                    b.x == x && b.y == y && b.z == z && b.block.material != Material::Barrier
+                }) {
                     block.block = Material::Air.default();
                 }
             } else if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) {
