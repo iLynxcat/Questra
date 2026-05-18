@@ -1,4 +1,5 @@
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum BlockState {
     None,
+    Sign(String),
 }

@@ -1,6 +1,6 @@
 use crate::level::block::{material::Material, state::BlockState};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct Block {
     pub material: Material,
     pub state: BlockState,
