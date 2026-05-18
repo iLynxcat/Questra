@@ -25,7 +25,7 @@ fn main() {
     rl.set_target_fps(60);
     rl.set_exit_key(Some(KeyboardKey::KEY_Q));
 
-    let mut state = GameState::load(&mut rl, &thread);
+    let mut state = GameState::load(&mut rl, &thread, &audio);
 
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
@@ -40,7 +40,7 @@ fn main() {
                 scene.draw(&mut d, &state.assets);
             }
             Scene::World(scene) => {
-                scene.update(&d);
+                scene.update(&d, &state.assets);
                 scene.draw(&mut d, &state.assets);
             }
         }

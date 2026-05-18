@@ -92,7 +92,7 @@ impl WorldScene {
         }
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle) {
+    pub fn update(&mut self, rl: &RaylibHandle, assets: &GameAssets) {
         if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
             || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
         {
@@ -175,18 +175,24 @@ impl WorldScene {
         if rl.is_key_pressed(KeyboardKey::KEY_X) {
             self.is_showing_wireframe = !self.is_showing_wireframe;
         }
-        if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET)
-            && self.camera.fovy_destination < ZOOM_FOVY_MAX
-        {
-            self.camera.fovy_destination += ZOOM_FOVY_INCREMENT;
+        if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET) {
+            assets.camera_shutter.set_pitch(1.2);
+            assets.camera_shutter.play();
+            if self.camera.fovy_destination < ZOOM_FOVY_MAX {
+                self.camera.fovy_destination += ZOOM_FOVY_INCREMENT;
+            }
         }
-        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET)
-            && self.camera.fovy_destination > ZOOM_FOVY_MIN
-        {
-            self.camera.fovy_destination -= ZOOM_FOVY_INCREMENT;
+        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET) {
+            assets.camera_shutter.set_pitch(0.9);
+            assets.camera_shutter.play();
+            if self.camera.fovy_destination > ZOOM_FOVY_MIN {
+                self.camera.fovy_destination -= ZOOM_FOVY_INCREMENT;
+            }
         }
         if rl.is_key_pressed(KeyboardKey::KEY_V) {
-            self.camera.direction = self.camera.direction.get_next()
+            assets.camera_shutter.set_pitch(0.7);
+            assets.camera_shutter.play();
+            self.camera.direction = self.camera.direction.get_next();
         }
 
         self.player.update(&rl);
