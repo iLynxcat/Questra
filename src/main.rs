@@ -1,5 +1,5 @@
 use questra::{scene::Scene, state::GameState};
-use raylib::{audio::RaylibAudio, ffi::KeyboardKey};
+use raylib::{audio::RaylibAudio, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
 fn main() {
     let (mut rl, thread) = raylib::init() //
@@ -25,17 +25,30 @@ fn main() {
     let mut state = GameState::load(&mut rl, &thread);
 
     while !rl.window_should_close() {
-        music.update_stream();
+        if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
+            state.is_muted = !state.is_muted;
+        }
+
+        let mut d = rl.begin_drawing(&thread);
 
         match &mut state.scene {
             Scene::Title(scene) => {
-                scene.update(&rl);
-                scene.draw(&mut rl.begin_drawing(&thread), &state.assets);
+                scene.update(&d);
+                scene.draw(&mut d, &state.assets);
             }
             Scene::World(scene) => {
-                scene.update(&rl);
-                scene.draw(&mut rl.begin_drawing(&thread), &state.assets);
+                scene.update(&d);
+                scene.draw(&mut d, &state.assets);
             }
         }
+
+        if state.is_muted {
+            music.set_volume(0.0);
+            d.draw_text("Mute", 10, 460, 18, Color::RED);
+        } else {
+            music.set_volume(1.0);
+        }
+
+        music.update_stream();
     }
 }

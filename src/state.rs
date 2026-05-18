@@ -8,6 +8,8 @@ use raylib::{RaylibHandle, RaylibThread};
 pub struct GameState {
     pub scene: Scene,
     pub assets: GameAssets,
+
+    pub is_muted: bool,
 }
 
 impl GameState {
@@ -17,6 +19,8 @@ impl GameState {
         Self {
             scene: Scene::World(WorldScene::new(level)),
             assets: GameAssets::load(rl, thread),
+
+            is_muted: true,
         }
     }
 }
