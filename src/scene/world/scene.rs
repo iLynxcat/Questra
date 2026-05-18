@@ -278,7 +278,7 @@ impl WorldScene {
             );
         }
 
-        b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
+        b.draw_texture(&assets.crosshair_sprite, 304, 224, Color::WHITE);
         drop(b);
     }
 
