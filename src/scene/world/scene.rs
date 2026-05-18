@@ -14,7 +14,7 @@ use raylib::{
 };
 
 const PLAYER_CAMERA_OFFSET_XZ: f32 = 45.0;
-const PLAYER_CAMERA_OFFSET_Y: f32 = 30.0;
+const PLAYER_CAMERA_OFFSET_Y: f32 = 15.0;
 
 const ZOOM_FOVY_MIN: f32 = 5.0;
 const ZOOM_FOVY_DEFAULT: f32 = 15.0;
@@ -59,7 +59,7 @@ impl WorldScene {
 
             sign_text: None,
             player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
-            camera: Camera3D::orthographic(
+            camera: Camera3D::perspective(
                 Vector3::new(
                     PLAYER_CAMERA_OFFSET_XZ,
                     PLAYER_CAMERA_OFFSET_Y,
