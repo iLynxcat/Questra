@@ -1,5 +1,6 @@
 use crate::scene::{title::TitleScene, world::WorldScene};
 
+pub mod render;
 pub mod title;
 pub mod world;
 
