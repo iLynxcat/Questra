@@ -16,8 +16,10 @@ use raylib::{
 pub struct WorldScene {
     pub is_frozen: bool,
     pub is_showing_pause_menu: bool,
-    pub is_showing_cursor: bool,
+    pub is_showing_debug: bool,
     pub hovered_block: Option<(i32, i32, i32, Vector3)>,
+
+    fps: u32,
 
     sign_text: Option<String>,
     player: Player,
@@ -32,8 +34,10 @@ impl WorldScene {
         Self {
             is_frozen: false,
             is_showing_pause_menu: false,
-            is_showing_cursor: false,
+            is_showing_debug: false,
             hovered_block: None,
+
+            fps: 0,
 
             sign_text: None,
             player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
@@ -119,11 +123,13 @@ impl WorldScene {
             }
         }
 
-        if rl.is_key_pressed(KeyboardKey::KEY_C) {
-            self.is_showing_cursor = !self.is_showing_cursor;
+        if rl.is_key_pressed(KeyboardKey::KEY_Z) {
+            self.is_showing_debug = !self.is_showing_debug;
+        }
         }
 
         self.player.update(&rl);
+        self.fps = rl.get_fps();
 
         self.camera.position = self.player.position.add(PLAYER_CAMERA_OFFSET);
         self.camera.target = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
@@ -159,7 +165,7 @@ impl WorldScene {
 
         drop(d3);
 
-        if self.is_showing_cursor {
+        if self.is_showing_debug {
             let mut b = d.begin_blend_mode(BlendMode::BLEND_CUSTOM);
             unsafe {
                 raylib_sys::rlSetBlendFactors(
@@ -171,6 +177,41 @@ impl WorldScene {
 
             b.draw_texture(&assets.crosshair_sprite, 288, 208, Color::WHITE);
             drop(b);
+
+            let version_line = {
+                let (x, y, z) = (
+                    self.player.position.x.floor(),
+                    self.player.position.y.floor(),
+                    self.player.position.z.floor(),
+                );
+                format!("Questra version {}", env!("CARGO_PKG_VERSION"))
+            };
+            let fps_line = {
+                let (x, y, z) = (
+                    self.player.position.x.floor(),
+                    self.player.position.y.floor(),
+                    self.player.position.z.floor(),
+                );
+                format!("{} FPS", self.fps)
+            };
+            let location_line = {
+                let (x, y, z) = (
+                    self.player.position.x.floor(),
+                    self.player.position.y.floor(),
+                    self.player.position.z.floor(),
+                );
+                format!("Player {} {} {}", x, y, z)
+            };
+            let hovering_line = self
+                .hovered_block
+                .map(|(x, y, z, ..)| format!("Hover {} {} {}", x, y, z));
+
+            d.draw_text(&version_line, 128, 4, 18, Color::WHITE);
+            d.draw_text(&fps_line, 128, 20, 18, Color::WHITE);
+            d.draw_text(&location_line, 128, 36, 18, Color::WHITE);
+            if let Some(hovering_line) = hovering_line {
+                d.draw_text(&hovering_line, 128, 52, 18, Color::WHITE);
+            }
         }
 
         if self.is_showing_pause_menu {
