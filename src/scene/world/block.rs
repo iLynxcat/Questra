@@ -27,6 +27,7 @@ fn block_tile(mat: Material, face: BlockFace) -> (u32, u32) {
         },
         Material::Stone => (0, 0),
         Material::Sign => (1, 0),
+        Material::Barrier => (3, 3),
         _ => (3, 0),
     }
 }
@@ -69,7 +70,7 @@ pub fn build_mesh(world: &HashMap<(i32, i32, i32), Material>) -> MeshData {
     let mut data = MeshData::default();
 
     for (&(x, y, z), &material) in world {
-        if material == Material::Air || material == Material::Barrier {
+        if material == Material::Air {
             continue;
         }
 
