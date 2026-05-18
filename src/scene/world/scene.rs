@@ -36,7 +36,7 @@ impl WorldScene {
             hovered_block: None,
 
             sign_text: None,
-            player: Player::new(Vector3::new(0.0, 7.0, 0.0)),
+            player: Player::new(Vector3::new(0.0, 13.0, 0.0)),
             camera: Camera3D::orthographic(
                 PLAYER_CAMERA_OFFSET,
                 Vector3::new(0.0, 1.0, 0.0),
@@ -137,7 +137,7 @@ impl WorldScene {
         for LevelBlock { block, x, y, z } in &self.level.blocks {
             let color: Color = match block.material {
                 Material::Air => continue, // skip rendering air entirely
-                Material::Barrier => continue,
+                Material::Barrier => Color::BLACK,
                 Material::Dirt => Color::DARKBROWN,
                 Material::Grass => Color::FORESTGREEN,
                 Material::Stone => Color::LIGHTSLATEGRAY,
