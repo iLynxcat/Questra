@@ -34,6 +34,14 @@ const ZOOM_FOVY_DEFAULT: f32 = 15.0;
 const ZOOM_FOVY_MAX: f32 = 30.0;
 const ZOOM_FOVY_INCREMENT: f32 = 5.0;
 
+const HELP_TEXTS: [&'static str; 5] = [
+    "Z = debug",
+    "[ = zoom out",
+    "] = zoom in",
+    "M = toggle mute",
+    "Q = quit",
+];
+
 impl WorldScene {
     pub fn new(level: Level) -> Self {
         Self {
@@ -226,10 +234,18 @@ impl WorldScene {
 
         if self.is_showing_pause_menu {
             d.draw_text("Pause", 10, 4, 18, Color::WHITE);
-            d.draw_text("Press Q to quit", 10, 20, 18, Color::WHITE);
+            let mut i = 0;
+            HELP_TEXTS.iter().for_each(|t| {
+                d.draw_text(*t, 10, 24 + (i * 18), 18, Color::WHITE);
+                i += 1;
+            });
         } else if self.is_frozen {
             d.draw_text("Frozen", 10, 4, 18, Color::WHITE);
-            d.draw_text("Press Q to quit", 10, 20, 18, Color::WHITE);
+            let mut i = 0;
+            HELP_TEXTS.iter().for_each(|t| {
+                d.draw_text(*t, 10, 24 + (i * 18), 18, Color::WHITE);
+                i += 1;
+            });
         }
 
         if let Some(text) = &self.sign_text {
