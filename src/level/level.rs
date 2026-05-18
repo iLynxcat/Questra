@@ -12,7 +12,7 @@ pub struct LevelBlock {
     pub block: Block,
 }
 
-const LEVEL_XZ_MAX: i32 = 16;
+const LEVEL_XZ_MAX: i32 = 32;
 const LEVEL_Y_MAX: i32 = 16;
 const LEVEL_TOTAL_BLOCKS: usize = (LEVEL_XZ_MAX * LEVEL_XZ_MAX * LEVEL_Y_MAX) as usize;
 
