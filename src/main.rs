@@ -40,7 +40,7 @@ fn main() {
         let mut d = rl.begin_drawing(&thread);
 
         let transition = match &mut state.scene {
-            Scene::Title(scene) => scene.update(&d),
+            Scene::Title(scene) => scene.update(&d, &state.assets),
             Scene::World(scene) => scene.update(&d, &state.assets),
         };
         match transition {

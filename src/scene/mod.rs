@@ -5,7 +5,6 @@ pub mod title;
 pub mod transition;
 pub mod world;
 
-pub enum Scene {
-    Title(TitleScene),
-    World(WorldScene),
-}
+mod scene;
+
+pub use scene::*;

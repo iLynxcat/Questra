@@ -1,37 +1,14 @@
+use std::{collections::HashMap, mem};
+
 use raylib::ffi;
-use std::collections::HashMap;
-use std::mem;
 
-use crate::level::block::{Block, BlockFace, BlockState, Material};
-
-const ATLAS_COLS: u32 = 4;
-const ATLAS_ROWS: u32 = 4;
-
-fn tile_uvs(col: u32, row: u32, atlas_cols: u32, atlas_rows: u32) -> (f32, f32, f32, f32) {
-    let (ac, ar) = (atlas_cols as f32, atlas_rows as f32);
-    (
-        (col + 1) as f32 / ac,
-        (row + 1) as f32 / ar,
-        (col) as f32 / ac,
-        (row) as f32 / ar,
-    )
-}
-
-fn block_tile(mat: Material, face: BlockFace) -> (u32, u32) {
-    match mat {
-        Material::Dirt => (0, 3),
-        Material::Grass => match face {
-            BlockFace::Up => (0, 1),
-            BlockFace::Down => (0, 3),
-            _ => (0, 2),
-        },
-        Material::Stone => (0, 0),
-        Material::Sign => (1, 0),
-        Material::Barrier => (3, 3),
-        Material::Water => (1, 1),
-        _ => (3, 0),
-    }
-}
+use crate::{
+    level::block::{Block, BlockFace, Material},
+    render::{
+        atlas::{block_tile, tile_uvs},
+        geometry::{block_height, is_solid_for},
+    },
+};
 
 #[derive(Default)]
 pub struct MeshData {
@@ -60,31 +37,6 @@ pub fn upload_mesh(data: MeshData) -> ffi::Mesh {
 
         ffi::UploadMesh(&mut mesh, false);
         mesh
-    }
-}
-
-fn is_solid_for(
-    world: &HashMap<(i32, i32, i32), Block>,
-    pos: (i32, i32, i32),
-    current: Material,
-    face: BlockFace,
-) -> bool {
-    match world.get(&pos) {
-        None => false,
-        Some(b) => match b.material {
-            Material::Air => false,
-            Material::Water => match face {
-                _ => current == Material::Water, // only cull water-water
-            },
-            _ => true,
-        },
-    }
-}
-
-fn block_height(block: &Block) -> f32 {
-    match block.state {
-        BlockState::LiquidLevel(level) => 0.9 * level,
-        _ => 1.0,
     }
 }
 
@@ -119,16 +71,7 @@ pub fn build_mesh(world: &HashMap<(i32, i32, i32), Block>) -> (MeshData, MeshDat
                 Material::Water => &mut water,
                 _ => &mut opaque,
             };
-            push_face(
-                target,
-                face,
-                fx,
-                fy,
-                fz,
-                h,
-                tile_uvs(tc, tr, ATLAS_COLS, ATLAS_ROWS),
-                brightness,
-            );
+            push_face(target, face, fx, fy, fz, h, tile_uvs(tc, tr), brightness);
         }
     }
 

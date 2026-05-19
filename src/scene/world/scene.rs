@@ -6,16 +6,14 @@ use crate::{
         Level,
         block::{Block, BlockState, Material},
     },
+    render::mesh::{build_mesh, make_model, upload_mesh},
     scene::{
         Scene,
         title::TitleScene,
         transition::SceneTransition,
         world::{
-            build_mesh,
             camera::{Camera, CameraDirection},
-            make_model,
             player::Player,
-            upload_mesh,
         },
     },
 };
@@ -24,9 +22,9 @@ use raylib::{
     color::Color,
     drawing::{RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3DExt},
     ffi,
-    math::{BoundingBox, Vector3},
+    math::{self, BoundingBox, Vector3},
 };
-use raylib_sys::{BlendMode, KeyboardKey, MouseButton};
+use raylib_sys::{BlendMode, GetRandomValue, KeyboardKey, MouseButton};
 
 const PLAYER_CAMERA_OFFSET_XZ: f32 = 45.0;
 const PLAYER_CAMERA_OFFSET_Y: f32 = 15.0;
@@ -339,7 +337,7 @@ impl Drop for WorldScene {
     }
 }
 
-fn draw_mesh(model: ffi::Model, as_wireframe: bool, alpha: f32) {
+pub fn draw_mesh(model: ffi::Model, as_wireframe: bool, alpha: f32) {
     const MODEL_POS: ffi::Vector3 = ffi::Vector3 {
         x: 0.0,
         y: 0.0,
