@@ -1,4 +1,8 @@
-use questra::{scene::Scene, sound::init_audio, state::GameState};
+use questra::{
+    scene::{Scene, transition::Transition},
+    sound::init_audio,
+    state::GameState,
+};
 use raylib::{audio::Music, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
 const TITLE: &str = concat!("Questra Alpha ", env!("CARGO_PKG_VERSION_PATCH"));
@@ -35,16 +39,18 @@ fn main() {
 
         let mut d = rl.begin_drawing(&thread);
 
-        match &mut state.scene {
-            Scene::Title(scene) => {
-                scene.update(&d);
-                scene.draw(&mut d, &state.assets);
-            }
-            Scene::World(scene) => {
-                scene.update(&d, &state.assets);
-                scene.draw(&mut d, &state.assets);
-            }
+        let transition = match &mut state.scene {
+            Scene::Title(scene) => scene.update(&d),
+            Scene::World(scene) => scene.update(&d, &state.assets),
+        };
+        if let Transition::To(next) = transition {
+            state.scene = next;
         }
+
+        match &mut state.scene {
+            Scene::Title(scene) => scene.draw(&mut d),
+            Scene::World(scene) => scene.draw(&mut d, &state.assets),
+        };
 
         let track = &ambience_tracks[ambience_i];
         if state.is_music_paused {

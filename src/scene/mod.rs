@@ -2,6 +2,7 @@ use crate::scene::{title::TitleScene, world::WorldScene};
 
 pub mod render;
 pub mod title;
+pub mod transition;
 pub mod world;
 
 pub enum Scene {

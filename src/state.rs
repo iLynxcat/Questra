@@ -1,7 +1,6 @@
 use crate::{
     assets::GameAssets,
-    level::Level,
-    scene::{Scene, world::WorldScene},
+    scene::{Scene, title::TitleScene},
 };
 use raylib::{RaylibHandle, RaylibThread, audio::RaylibAudio};
 
@@ -14,10 +13,8 @@ pub struct GameState<'aud> {
 
 impl<'aud> GameState<'aud> {
     pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, audio: &'aud RaylibAudio) -> Self {
-        let level = Level::new();
-
         Self {
-            scene: Scene::World(WorldScene::new(level)),
+            scene: Scene::Title(TitleScene::new(rl, &thread)),
             assets: GameAssets::load(rl, thread, audio),
 
             is_music_paused: cfg!(debug_assertions),
