@@ -1,5 +1,5 @@
 use questra::{
-    scene::{Scene, transition::Transition},
+    scene::{Scene, transition::SceneTransition},
     sound::init_audio,
     state::GameState,
 };
@@ -44,11 +44,11 @@ fn main() {
             Scene::World(scene) => scene.update(&d, &state.assets),
         };
         match transition {
-            Transition::To(next) => {
+            SceneTransition::To(next) => {
                 state.scene = next;
             }
-            Transition::Quit => break,
-            Transition::None => {}
+            SceneTransition::Quit => break,
+            SceneTransition::None => {}
         };
 
         match &mut state.scene {

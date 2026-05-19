@@ -9,7 +9,7 @@ use raylib::{
 use crate::{
     assets::GameAssets,
     level::Level,
-    scene::{Scene, transition::Transition, world::WorldScene},
+    scene::{Scene, transition::SceneTransition, world::WorldScene},
 };
 
 const TEXT_FLASH_FRAMES: u8 = 16;
@@ -42,7 +42,7 @@ impl TitleScene {
         }
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle) -> Transition {
+    pub fn update(&mut self, rl: &RaylibHandle) -> SceneTransition {
         if self.fade_dir != 0.0 {
             const FPS: f32 = 15.0;
             const ONE_FRAME: f32 = 1.0 / FPS;
@@ -58,10 +58,10 @@ impl TitleScene {
                 } else if self.black_alpha >= 1.0 && self.fade_dir == 1.0 {
                     return match self.fade_target {
                         Some(FadeTarget::Game) => {
-                            Transition::To(Scene::World(WorldScene::new(Level::new())))
+                            SceneTransition::To(Scene::World(WorldScene::new(Level::new())))
                         }
-                        Some(FadeTarget::Quit) => Transition::Quit,
-                        None => Transition::None,
+                        Some(FadeTarget::Quit) => SceneTransition::Quit,
+                        None => SceneTransition::None,
                     };
                 }
             }
@@ -78,7 +78,7 @@ impl TitleScene {
             }
         }
 
-        Transition::None
+        SceneTransition::None
     }
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {

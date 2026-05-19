@@ -9,7 +9,7 @@ use crate::{
     scene::{
         Scene,
         title::TitleScene,
-        transition::Transition,
+        transition::SceneTransition,
         world::{
             build_mesh,
             camera::{Camera, CameraDirection},
@@ -96,7 +96,7 @@ impl WorldScene {
         }
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle, assets: &GameAssets) -> Transition {
+    pub fn update(&mut self, rl: &RaylibHandle, assets: &GameAssets) -> SceneTransition {
         if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
             || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
         {
@@ -104,11 +104,11 @@ impl WorldScene {
             self.is_frozen = self.is_showing_pause_menu;
         }
         if rl.is_key_pressed(KeyboardKey::KEY_Q) {
-            return Transition::To(Scene::Title(TitleScene::new()));
+            return SceneTransition::To(Scene::Title(TitleScene::new()));
         }
 
         if self.is_frozen {
-            return Transition::None;
+            return SceneTransition::None;
         }
 
         let mouse = rl.get_mouse_position();
@@ -238,7 +238,7 @@ impl WorldScene {
             self.level_mesh_is_dirty = false;
         }
 
-        Transition::None
+        SceneTransition::None
     }
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {

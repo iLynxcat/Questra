@@ -1,6 +1,6 @@
 use crate::scene::Scene;
 
-pub enum Transition {
+pub enum SceneTransition {
     None,
     To(Scene),
     Quit,
