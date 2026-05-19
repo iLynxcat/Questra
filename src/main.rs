@@ -15,7 +15,10 @@ fn main() {
     let audio = init_audio(0.3);
     let mut state = GameState::load(&mut rl, &thread, &audio);
 
-    let ambience_tracks: Vec<&Music<'_>> = vec![&state.assets.music.lamentable];
+    let ambience_tracks: Vec<&Music<'_>> = vec![
+        &state.assets.music.lamentable,
+        &state.assets.music.summer_night_feast,
+    ];
     let mut current_ambience: usize = 0;
 
     while !rl.window_should_close() {
