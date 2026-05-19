@@ -176,22 +176,22 @@ impl WorldScene {
             self.is_showing_wireframe = !self.is_showing_wireframe;
         }
         if rl.is_key_pressed(KeyboardKey::KEY_LEFT_BRACKET) {
-            assets.camera_shutter.set_pitch(1.2);
-            assets.camera_shutter.play();
+            assets.sfx.camera_shutter.set_pitch(1.0);
+            assets.sfx.camera_shutter.play();
             if self.camera.fovy_destination < ZOOM_FOVY_MAX {
                 self.camera.fovy_destination += ZOOM_FOVY_INCREMENT;
             }
         }
         if rl.is_key_pressed(KeyboardKey::KEY_RIGHT_BRACKET) {
-            assets.camera_shutter.set_pitch(0.9);
-            assets.camera_shutter.play();
+            assets.sfx.camera_shutter.set_pitch(1.2);
+            assets.sfx.camera_shutter.play();
             if self.camera.fovy_destination > ZOOM_FOVY_MIN {
                 self.camera.fovy_destination -= ZOOM_FOVY_INCREMENT;
             }
         }
         if rl.is_key_pressed(KeyboardKey::KEY_V) {
-            assets.camera_shutter.set_pitch(0.7);
-            assets.camera_shutter.play();
+            assets.sfx.camera_shutter.set_pitch(0.7);
+            assets.sfx.camera_shutter.play();
             self.camera.direction = self.camera.direction.get_next();
         }
 
