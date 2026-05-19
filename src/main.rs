@@ -1,8 +1,7 @@
-use questra::{scene::Scene, state::GameState};
-use raylib::{audio::RaylibAudio, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
+use questra::{scene::Scene, sound::init_audio, state::GameState};
+use raylib::{audio::Music, color::Color, drawing::RaylibDraw, ffi::KeyboardKey};
 
 const TITLE: &str = concat!("Questra Alpha ", env!("CARGO_PKG_VERSION_PATCH"));
-const SOUNDTRACK: &str = concat!("res/music/lamentable.mp3");
 
 fn main() {
     let (mut rl, thread) = raylib::init() //
@@ -10,22 +9,14 @@ fn main() {
         .title(TITLE)
         .build();
 
-    let Ok(audio) = RaylibAudio::init_audio_device() else {
-        panic!("could not init audio device!");
-    };
-
-    audio.set_master_volume(0.3);
-    let Ok(mut music) = audio.new_music(SOUNDTRACK) else {
-        panic!("failed to load music!")
-    };
-
-    music.looping = true;
-    music.play_stream();
-
     rl.set_target_fps(60);
     rl.set_exit_key(Some(KeyboardKey::KEY_Q));
 
+    let audio = init_audio(0.3);
     let mut state = GameState::load(&mut rl, &thread, &audio);
+
+    let ambience_tracks: Vec<&Music<'_>> = vec![&state.assets.music.lamentable];
+    let mut current_ambience: usize = 0;
 
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
@@ -45,16 +36,28 @@ fn main() {
             }
         }
 
+        let track = &ambience_tracks[current_ambience];
         if state.is_music_paused {
             d.draw_text("Music Paused", 10, 460, 18, Color::GOLDENROD);
 
-            if music.is_stream_playing() {
-                music.pause_stream();
+            if track.is_stream_playing() {
+                track.pause_stream();
             }
-        } else if !state.is_music_paused && !music.is_stream_playing() {
-            music.play_stream();
-        }
 
-        music.update_stream();
+            track.update_stream();
+        } else {
+            if (track.get_time_played() / track.get_time_length()) >= 1.0 {
+                track.stop_stream();
+                current_ambience = (current_ambience + 1) % ambience_tracks.len();
+                let track = ambience_tracks[current_ambience];
+                track.play_stream();
+                track.update_stream();
+            } else {
+                if !track.is_stream_playing() {
+                    track.play_stream();
+                }
+                track.update_stream();
+            }
+        }
     }
 }

@@ -1,8 +1,6 @@
-use raylib::{
-    RaylibHandle, RaylibThread,
-    audio::{RaylibAudio, Sound},
-    texture::Texture2D,
-};
+use raylib::{RaylibHandle, RaylibThread, audio::RaylibAudio, texture::Texture2D};
+
+use crate::sound::{music::MusicTracks, sfx::SoundEffects};
 
 pub struct GameAssets<'aud> {
     pub player_sprite: Texture2D,
@@ -10,7 +8,8 @@ pub struct GameAssets<'aud> {
     pub title_sprite: Texture2D,
     pub texture_atlas: Texture2D,
 
-    pub camera_shutter: Sound<'aud>,
+    pub music: MusicTracks<'aud>,
+    pub sfx: SoundEffects<'aud>,
 }
 
 impl<'aud> GameAssets<'aud> {
@@ -29,9 +28,8 @@ impl<'aud> GameAssets<'aud> {
                 .load_texture(thread, "res/atlas.png")
                 .expect("Failed to load texture atlas"),
 
-            camera_shutter: audio
-                .new_sound("res/sfx/shutter.mp3")
-                .expect("Failed to load camera shutter sound"),
+            music: MusicTracks::new(audio),
+            sfx: SoundEffects::new(audio),
         }
     }
 }
