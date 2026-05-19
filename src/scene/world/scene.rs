@@ -40,7 +40,7 @@ const HELP_TEXTS: [&'static str; 7] = [
     "] = zoom +",
     "M = music on/off",
     "N = next track",
-    "V = change angle",
+    ">/< = change angle",
     "Q = quit",
 ];
 
@@ -189,7 +189,12 @@ impl WorldScene {
                 self.camera.fovy_destination -= ZOOM_FOVY_INCREMENT;
             }
         }
-        if rl.is_key_pressed(KeyboardKey::KEY_V) {
+        if rl.is_key_pressed(KeyboardKey::KEY_LEFT) {
+            assets.sfx.camera_shutter.set_pitch(0.7);
+            assets.sfx.camera_shutter.play();
+            self.camera.direction = self.camera.direction.get_prev();
+        }
+        if rl.is_key_pressed(KeyboardKey::KEY_RIGHT) {
             assets.sfx.camera_shutter.set_pitch(0.7);
             assets.sfx.camera_shutter.play();
             self.camera.direction = self.camera.direction.get_next();
