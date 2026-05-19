@@ -1,51 +1,45 @@
 use raylib::{
-    RaylibHandle, RaylibThread,
+    RaylibHandle,
     color::Color,
     drawing::{RaylibDraw, RaylibDrawHandle},
     ffi,
     math::{Rectangle, Vector2},
-    texture::Texture2D,
 };
-use raylib_sys::TextureWrap;
 
 use crate::{
+    assets::GameAssets,
     level::Level,
     scene::{Scene, transition::Transition, world::WorldScene},
 };
 
 const TEXT_FLASH_FRAMES: u8 = 16;
 
-pub struct TitleScene {
-    title_sprite: Texture2D,
+enum FadeTarget {
+    Game,
+    Quit,
+}
 
+pub struct TitleScene {
     black_alpha: f32,
     fade_time_remain: f32,
     /// Set to:
     /// -1.0 = fade in, 1.0 = fade out, 0.0 = idle.
     fade_dir: f32,
+    fade_target: Option<FadeTarget>,
 
     flash_frame: u8,
 }
 
 impl TitleScene {
-    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
-        let scene = Self {
-            title_sprite: rl
-                .load_texture(thread, "res/title.png")
-                .expect("res/title.png should load"),
-
+    pub fn new() -> Self {
+        Self {
             black_alpha: 1.0,
             fade_time_remain: 0.0,
             fade_dir: -1.0,
+            fade_target: None,
 
             flash_frame: 0,
-        };
-
-        unsafe {
-            ffi::SetTextureWrap(*scene.title_sprite, TextureWrap::TEXTURE_WRAP_REPEAT as i32);
         }
-
-        scene
     }
 
     pub fn update(&mut self, rl: &RaylibHandle) -> Transition {
@@ -59,16 +53,22 @@ impl TitleScene {
                 self.fade_time_remain -= ONE_FRAME;
                 self.black_alpha = (self.black_alpha + self.fade_dir / FPS).clamp(0.0, 1.0);
 
-                if self.black_alpha <= 0.0 || self.black_alpha >= 1.0 {
-                    if self.fade_dir == 1.0 {
-                        return Transition::To(Scene::World(WorldScene::new(Level::new())));
-                    } else {
-                        self.fade_dir = 0.0;
-                    }
+                if self.black_alpha <= 0.0 {
+                    self.fade_dir = 0.0;
+                } else if self.black_alpha >= 1.0 && self.fade_dir == 1.0 {
+                    return match self.fade_target {
+                        Some(FadeTarget::Game) => {
+                            Transition::To(Scene::World(WorldScene::new(Level::new())))
+                        }
+                        Some(FadeTarget::Quit) => Transition::Quit,
+                        None => Transition::None,
+                    };
                 }
             }
         } else if rl.is_key_pressed(ffi::KeyboardKey::KEY_SPACE) {
-            self.start_fade_out();
+            self.start_fade_out(FadeTarget::Game);
+        } else if rl.is_key_pressed(ffi::KeyboardKey::KEY_Q) {
+            self.start_fade_out(FadeTarget::Quit);
         } else {
             const ONE_FRAME: f32 = 1.0 / 15.0;
             self.fade_time_remain += rl.get_frame_time();
@@ -81,19 +81,16 @@ impl TitleScene {
         Transition::None
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::BLACK);
 
         if self.black_alpha >= 1.0 {
             return;
         }
 
-        let (w, h) = (
-            self.title_sprite.width as f32,
-            self.title_sprite.height as f32,
-        );
+        let (w, h) = (assets.title.width as f32, assets.title.height as f32);
         d.draw_texture_rec(
-            &self.title_sprite,
+            &assets.title,
             Rectangle::new(0.0, 0.0, w, h),
             Vector2::new((d.get_screen_width() as f32 / 2.0) - (w / 2.0), 24.0),
             Color::WHITE,
@@ -122,8 +119,9 @@ impl TitleScene {
         }
     }
 
-    fn start_fade_out(&mut self) {
+    fn start_fade_out(&mut self, target: FadeTarget) {
         self.fade_dir = 1.0;
+        self.fade_target = Some(target);
     }
 
     fn get_text_alpha(&self) -> f32 {

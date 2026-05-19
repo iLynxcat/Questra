@@ -7,6 +7,8 @@ use crate::{
         block::{Block, BlockState, Material},
     },
     scene::{
+        Scene,
+        title::TitleScene,
         transition::Transition,
         world::{
             build_mesh,
@@ -44,7 +46,7 @@ const HELP_TEXTS: [&'static str; 7] = [
     "M = music on/off",
     "N = next track",
     ">/< = change angle",
-    "Q = quit",
+    "Q = back to title",
 ];
 
 pub struct WorldScene {
@@ -172,6 +174,9 @@ impl WorldScene {
             }
         }
 
+        if rl.is_key_pressed(KeyboardKey::KEY_Q) {
+            return Transition::To(Scene::Title(TitleScene::new()));
+        }
         if rl.is_key_pressed(KeyboardKey::KEY_Z) {
             self.is_showing_debug = !self.is_showing_debug;
         }
