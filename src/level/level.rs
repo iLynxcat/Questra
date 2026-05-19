@@ -30,7 +30,11 @@ impl Level {
                     } else if y >= LEVEL_Y_SURFACE - 3 && y < LEVEL_Y_SURFACE {
                         Material::Dirt.default()
                     } else if y == LEVEL_Y_SURFACE {
-                        Material::Grass.default()
+                        if x > -5 && x < 5 && z > -5 && z < 5 {
+                            Material::Water.default()
+                        } else {
+                            Material::Grass.default()
+                        }
                     } else {
                         Material::Air.default()
                     };
@@ -41,12 +45,5 @@ impl Level {
         }
 
         Self { blocks }
-    }
-
-    pub fn to_material_map(&self) -> HashMap<(i32, i32, i32), Material> {
-        self.blocks
-            .iter()
-            .map(|(&(x, y, z), block)| ((x, y, z), block.material))
-            .collect()
     }
 }

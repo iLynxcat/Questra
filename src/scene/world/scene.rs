@@ -22,10 +22,7 @@ use crate::{
 use raylib::{
     RaylibHandle,
     color::Color,
-    drawing::{
-        RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3D,
-        RaylibMode3DExt,
-    },
+    drawing::{RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3DExt},
     ffi,
     math::{BoundingBox, Vector3},
 };
@@ -62,7 +59,8 @@ pub struct WorldScene {
     player: Player,
     camera: Camera,
     level: Level,
-    level_mesh: Option<ffi::Model>,
+    level_mesh_opaque: Option<ffi::Model>,
+    level_mesh_water: Option<ffi::Model>,
     level_mesh_is_dirty: bool,
 }
 
@@ -92,7 +90,8 @@ impl WorldScene {
                 ZOOM_FOVY_DEFAULT,
             ),
             level,
-            level_mesh: None,
+            level_mesh_opaque: None,
+            level_mesh_water: None,
             level_mesh_is_dirty: true,
         }
     }
@@ -230,23 +229,38 @@ impl WorldScene {
 
         self.camera.update(&rl);
 
+        if self.level_mesh_is_dirty {
+            let (opaque_mesh, water_mesh) = build_mesh(&self.level.blocks);
+            self.level_mesh_opaque =
+                Some(make_model(upload_mesh(opaque_mesh), &assets.texture_atlas));
+            self.level_mesh_water =
+                Some(make_model(upload_mesh(water_mesh), &assets.texture_atlas));
+            self.level_mesh_is_dirty = false;
+        }
+
         Transition::None
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::SKYBLUE);
 
         let mut d3 = d.begin_mode3D(&self.camera.raycam);
 
-        self.draw_world_mesh(&mut d3, &assets);
+        if let Some(opaque) = self.level_mesh_opaque {
+            draw_mesh(opaque, self.is_showing_wireframe, 1.0);
+        }
+
+        self.player.draw(&mut d3, &self.camera, &assets);
+
+        if let Some(water) = self.level_mesh_water {
+            draw_mesh(water, self.is_showing_wireframe, 0.3);
+        }
 
         if let Some((x, y, z, ..)) = &self.hovered_block {
             let (x, y, z) = (*x as f32, *y as f32, *z as f32);
 
             d3.draw_cube_wires(Vector3::new(x, y + 0.5, z), 1.0, 1.0, 1.0, Color::RED);
         }
-
-        self.player.draw(&mut d3, &self.camera, &assets);
 
         drop(d3);
 
@@ -256,56 +270,15 @@ impl WorldScene {
         }
 
         if self.is_showing_pause_menu {
-            self.draw_frozen_text(d, "Paused");
+            draw_frozen_text(d, "Paused");
         } else if self.is_frozen {
-            self.draw_frozen_text(d, "Frozen");
+            draw_frozen_text(d, "Frozen");
         }
 
         if let Some(text) = &self.sign_text {
             d.draw_text(&text, 15, 132, 18, Color::BLACK.alpha(0.5));
             d.draw_text(&text, 10, 128, 18, Color::WHITE);
         }
-    }
-
-    fn draw_world_mesh(&mut self, _d3: &mut RaylibMode3D<RaylibDrawHandle>, assets: &GameAssets) {
-        if self.level_mesh_is_dirty {
-            self.level_mesh = Some(make_model(
-                upload_mesh(build_mesh(&self.level.to_material_map())),
-                &assets.texture_atlas,
-            ));
-            self.level_mesh_is_dirty = false;
-        }
-
-        if let Some(model) = self.level_mesh {
-            unsafe {
-                let pos = ffi::Vector3 {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                };
-                let white = ffi::Color {
-                    r: 255,
-                    g: 255,
-                    b: 255,
-                    a: 255,
-                };
-
-                if self.is_showing_wireframe {
-                    ffi::DrawModelWires(model, pos, 1.0, white);
-                } else {
-                    ffi::DrawModel(model, pos, 1.0, white);
-                }
-            }
-        }
-    }
-
-    fn draw_frozen_text(&self, d: &mut RaylibDrawHandle, label: &'static str) {
-        d.draw_text(label, 10, 4, 18, Color::WHITE);
-        let mut i = 0;
-        HELP_TEXTS.iter().for_each(|t| {
-            d.draw_text(*t, 10, 24 + (i * 18), 18, Color::WHITE);
-            i += 1;
-        });
     }
 
     fn draw_crosshair(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
@@ -356,9 +329,40 @@ impl WorldScene {
 impl Drop for WorldScene {
     fn drop(&mut self) {
         unsafe {
-            if let Some(model) = self.level_mesh.take() {
+            if let Some(model) = self.level_mesh_opaque.take() {
                 ffi::UnloadModel(model);
             }
+            if let Some(model) = self.level_mesh_water.take() {
+                ffi::UnloadModel(model);
+            }
+        }
+    }
+}
+
+fn draw_mesh(model: ffi::Model, as_wireframe: bool, alpha: f32) {
+    const MODEL_POS: ffi::Vector3 = ffi::Vector3 {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
+
+    unsafe {
+        let tint: ffi::Color = Color::WHITE.alpha(alpha).into();
+
+        if alpha < 1.0 {
+            ffi::rlDisableDepthMask();
+            ffi::BeginBlendMode(BlendMode::BLEND_ALPHA as i32);
+        }
+
+        if as_wireframe {
+            ffi::DrawModelWires(model, MODEL_POS, 1.0, tint);
+        } else {
+            ffi::DrawModel(model, MODEL_POS, 1.0, tint);
+        }
+
+        if alpha < 1.0 {
+            ffi::EndBlendMode();
+            ffi::rlEnableDepthMask();
         }
     }
 }
@@ -370,4 +374,13 @@ fn offset_from_normal(normal: Vector3) -> (i32, i32, i32) {
         normal.y.round() as i32,
         normal.z.round() as i32,
     )
+}
+
+fn draw_frozen_text(d: &mut RaylibDrawHandle, label: &'static str) {
+    d.draw_text(label, 10, 4, 18, Color::WHITE);
+    let mut i = 0;
+    HELP_TEXTS.iter().for_each(|t| {
+        d.draw_text(*t, 10, 24 + (i * 18), 18, Color::WHITE);
+        i += 1;
+    });
 }

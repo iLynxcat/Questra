@@ -2,7 +2,7 @@ use raylib::ffi;
 use std::collections::HashMap;
 use std::mem;
 
-use crate::level::block::{BlockFace, Material};
+use crate::level::block::{Block, BlockFace, BlockState, Material};
 
 const ATLAS_COLS: u32 = 4;
 const ATLAS_ROWS: u32 = 4;
@@ -28,6 +28,7 @@ fn block_tile(mat: Material, face: BlockFace) -> (u32, u32) {
         Material::Stone => (0, 0),
         Material::Sign => (1, 0),
         Material::Barrier => (3, 3),
+        Material::Water => (1, 1),
         _ => (3, 0),
     }
 }
@@ -62,48 +63,76 @@ pub fn upload_mesh(data: MeshData) -> ffi::Mesh {
     }
 }
 
-fn is_solid(world: &HashMap<(i32, i32, i32), Material>, pos: (i32, i32, i32)) -> bool {
-    matches!(world.get(&pos), Some(b) if *b != Material::Air)
+fn is_solid_for(
+    world: &HashMap<(i32, i32, i32), Block>,
+    pos: (i32, i32, i32),
+    current: Material,
+    face: BlockFace,
+) -> bool {
+    match world.get(&pos) {
+        None => false,
+        Some(b) => match b.material {
+            Material::Air => false,
+            Material::Water => match face {
+                _ => current == Material::Water, // only cull water-water
+            },
+            _ => true,
+        },
+    }
 }
 
-pub fn build_mesh(world: &HashMap<(i32, i32, i32), Material>) -> MeshData {
-    let mut data = MeshData::default();
+fn block_height(block: &Block) -> f32 {
+    match block.state {
+        BlockState::LiquidLevel(level) => 0.9 * level,
+        _ => 1.0,
+    }
+}
 
-    for (&(x, y, z), &material) in world {
-        if material == Material::Air {
+pub fn build_mesh(world: &HashMap<(i32, i32, i32), Block>) -> (MeshData, MeshData) {
+    let mut opaque = MeshData::default();
+    let mut water = MeshData::default();
+
+    for (&(x, y, z), block) in world {
+        if block.material == Material::Air {
             continue;
         }
 
         let (xi, yi, zi) = (x as i32, y as i32, z as i32);
         let (fx, fy, fz) = (x as f32, y as f32, z as f32);
 
+        let h = block_height(&block);
         let candidates = [
-            (BlockFace::Up, xi, yi + 1, zi, 1.0f32),
-            (BlockFace::Down, xi, yi - 1, zi, 0.6),
-            (BlockFace::North, xi, yi, zi + 1, 0.8),
-            (BlockFace::South, xi, yi, zi - 1, 0.8),
-            (BlockFace::East, xi + 1, yi, zi, 0.9),
-            (BlockFace::West, xi - 1, yi, zi, 0.9),
+            (BlockFace::Up, xi, yi + 1, zi, 1.0, h),
+            (BlockFace::Down, xi, yi - 1, zi, 0.6, h),
+            (BlockFace::North, xi, yi, zi + 1, 0.8, h),
+            (BlockFace::South, xi, yi, zi - 1, 0.8, h),
+            (BlockFace::East, xi + 1, yi, zi, 0.9, h),
+            (BlockFace::West, xi - 1, yi, zi, 0.9, h),
         ];
 
-        for (face, nx, ny, nz, brightness) in candidates {
-            if is_solid(world, (nx, ny, nz)) {
+        for (face, nx, ny, nz, brightness, h) in candidates {
+            if is_solid_for(world, (nx, ny, nz), block.material, face) {
                 continue;
             }
-            let (tc, tr) = block_tile(material, face);
+            let (tc, tr) = block_tile(block.material, face);
+            let target = match block.material {
+                Material::Water => &mut water,
+                _ => &mut opaque,
+            };
             push_face(
-                &mut data,
+                target,
                 face,
                 fx,
                 fy,
                 fz,
+                h,
                 tile_uvs(tc, tr, ATLAS_COLS, ATLAS_ROWS),
                 brightness,
             );
         }
     }
 
-    data
+    (opaque, water)
 }
 
 fn push_face(
@@ -112,11 +141,12 @@ fn push_face(
     x: f32,
     y: f32,
     z: f32,
+    height: f32,
     uvs: (f32, f32, f32, f32),
     brightness: f32,
 ) {
     let (x0, x1) = (x - 0.5, x + 0.5);
-    let (y0, y1) = (y, y + 1.0);
+    let (y0, y1) = (y, y + height);
     let (z0, z1) = (z - 0.5, z + 0.5);
 
     let verts: [[f32; 3]; 4] = match face {
