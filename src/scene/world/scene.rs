@@ -6,12 +6,15 @@ use crate::{
         Level,
         block::{Block, BlockState, Material},
     },
-    scene::world::{
-        build_mesh,
-        camera::{Camera, CameraDirection},
-        make_model,
-        player::Player,
-        upload_mesh,
+    scene::{
+        transition::Transition,
+        world::{
+            build_mesh,
+            camera::{Camera, CameraDirection},
+            make_model,
+            player::Player,
+            upload_mesh,
+        },
     },
 };
 use raylib::{
@@ -92,7 +95,7 @@ impl WorldScene {
         }
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle, assets: &GameAssets) {
+    pub fn update(&mut self, rl: &RaylibHandle, assets: &GameAssets) -> Transition {
         if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
             || rl.is_key_pressed_repeat(KeyboardKey::KEY_ESCAPE)
         {
@@ -101,7 +104,7 @@ impl WorldScene {
         }
 
         if self.is_frozen {
-            return;
+            return Transition::None;
         }
 
         let mouse = rl.get_mouse_position();
@@ -221,6 +224,8 @@ impl WorldScene {
         self.camera.target_destination = self.player.position.add(Vector3::new(0.0, 1.0, 0.0));
 
         self.camera.update(&rl);
+
+        Transition::None
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, assets: &GameAssets) {

@@ -5,7 +5,6 @@ use crate::sound::{music::MusicTracks, sfx::SoundEffects};
 pub struct GameAssets<'aud> {
     pub player_sprite: Texture2D,
     pub crosshair_sprite: Texture2D,
-    pub title_sprite: Texture2D,
     pub texture_atlas: Texture2D,
 
     pub music: MusicTracks<'aud>,
@@ -21,9 +20,6 @@ impl<'aud> GameAssets<'aud> {
             crosshair_sprite: rl
                 .load_texture(thread, "res/cursor.png")
                 .expect("Failed to load cursor sprite"),
-            title_sprite: rl
-                .load_texture(thread, "res/title.png")
-                .expect("Failed to load title sprite"),
             texture_atlas: rl
                 .load_texture(thread, "res/atlas.png")
                 .expect("Failed to load texture atlas"),
