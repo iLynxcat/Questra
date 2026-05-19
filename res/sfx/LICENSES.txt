@@ -2,3 +2,7 @@ shutter.mp3
 	Copyright © 2026 Lynn Stratus.
 	All rights reserved.
 	Distributed with Questra with permission.
+
+SeaShore Wave 3 (wave.wav)
+	Retrieved from https://freesound.org/people/garandM1/sounds/799250.
+	CC0.

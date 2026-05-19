@@ -110,6 +110,14 @@ impl TitleScene {
             self.camera.update(rl);
         }
 
+        if !assets.sfx.waves_ambience.is_playing() {
+            assets
+                .sfx
+                .waves_ambience
+                .set_pitch(rand::random_range(0.7..1.3));
+            assets.sfx.waves_ambience.play();
+        }
+
         SceneTransition::None
     }
 
