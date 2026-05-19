@@ -14,7 +14,7 @@ pub struct GameState<'aud> {
 impl<'aud> GameState<'aud> {
     pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, audio: &'aud RaylibAudio) -> Self {
         Self {
-            scene: Scene::Title(TitleScene::new(rl, &thread)),
+            scene: Scene::Title(TitleScene::new()),
             assets: GameAssets::load(rl, thread, audio),
 
             is_music_paused: cfg!(debug_assertions),

@@ -14,7 +14,7 @@ fn main() {
         .build();
 
     rl.set_target_fps(60);
-    rl.set_exit_key(Some(KeyboardKey::KEY_Q));
+    rl.set_exit_key(None);
 
     let audio = init_audio(0.3);
     let mut state = GameState::load(&mut rl, &thread, &audio);
@@ -43,12 +43,16 @@ fn main() {
             Scene::Title(scene) => scene.update(&d),
             Scene::World(scene) => scene.update(&d, &state.assets),
         };
-        if let Transition::To(next) = transition {
-            state.scene = next;
-        }
+        match transition {
+            Transition::To(next) => {
+                state.scene = next;
+            }
+            Transition::Quit => break,
+            Transition::None => {}
+        };
 
         match &mut state.scene {
-            Scene::Title(scene) => scene.draw(&mut d),
+            Scene::Title(scene) => scene.draw(&mut d, &state.assets),
             Scene::World(scene) => scene.draw(&mut d, &state.assets),
         };
 
