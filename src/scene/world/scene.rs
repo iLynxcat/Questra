@@ -104,6 +104,9 @@ impl WorldScene {
             self.is_showing_pause_menu = !self.is_showing_pause_menu;
             self.is_frozen = self.is_showing_pause_menu;
         }
+        if rl.is_key_pressed(KeyboardKey::KEY_Q) {
+            return Transition::To(Scene::Title(TitleScene::new()));
+        }
 
         if self.is_frozen {
             return Transition::None;
@@ -174,9 +177,6 @@ impl WorldScene {
             }
         }
 
-        if rl.is_key_pressed(KeyboardKey::KEY_Q) {
-            return Transition::To(Scene::Title(TitleScene::new()));
-        }
         if rl.is_key_pressed(KeyboardKey::KEY_Z) {
             self.is_showing_debug = !self.is_showing_debug;
         }
