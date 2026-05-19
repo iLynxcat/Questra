@@ -128,7 +128,7 @@ impl TitleScene {
             return;
         }
 
-        let mut d3 = d.begin_mode3D(self.camera.raycam);
+        let d3 = d.begin_mode3D(self.camera.raycam);
 
         if let Some(opaque) = self.mesh_opaque {
             draw_mesh(opaque, false, 1.0);

@@ -22,9 +22,9 @@ use raylib::{
     color::Color,
     drawing::{RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3DExt},
     ffi,
-    math::{self, BoundingBox, Vector3},
+    math::{BoundingBox, Vector3},
 };
-use raylib_sys::{BlendMode, GetRandomValue, KeyboardKey, MouseButton};
+use raylib_sys::{BlendMode, KeyboardKey, MouseButton};
 
 const PLAYER_CAMERA_OFFSET_XZ: f32 = 45.0;
 const PLAYER_CAMERA_OFFSET_Y: f32 = 15.0;
