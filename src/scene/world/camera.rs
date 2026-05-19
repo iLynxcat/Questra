@@ -4,6 +4,7 @@ use raylib::{RaylibHandle, camera::Camera3D, math::Vector3};
 
 use crate::scene::render::lerp_smooth;
 
+#[derive(Clone, Copy, PartialEq)]
 pub enum CameraDirection {
     PlusXPlusZ = 0,
     MinusXPlusZ = 1,
@@ -12,13 +13,21 @@ pub enum CameraDirection {
 }
 
 impl CameraDirection {
+    const DIRECTIONS: [CameraDirection; 4] = [
+        Self::PlusXPlusZ,
+        Self::PlusXMinusZ,
+        Self::MinusXMinusZ,
+        Self::MinusXPlusZ,
+    ];
+
     pub fn get_next(&self) -> Self {
-        match self {
-            Self::PlusXPlusZ => Self::MinusXPlusZ,
-            Self::MinusXPlusZ => Self::MinusXMinusZ,
-            Self::MinusXMinusZ => Self::PlusXMinusZ,
-            Self::PlusXMinusZ => Self::PlusXPlusZ,
-        }
+        let i = Self::DIRECTIONS.iter().position(|d| d == self).unwrap();
+        Self::DIRECTIONS[(i + 1) % Self::DIRECTIONS.len()]
+    }
+
+    pub fn get_prev(&self) -> Self {
+        let i = Self::DIRECTIONS.iter().position(|d| d == self).unwrap();
+        Self::DIRECTIONS[(i + Self::DIRECTIONS.len() - 1) % Self::DIRECTIONS.len()]
     }
 }
 
