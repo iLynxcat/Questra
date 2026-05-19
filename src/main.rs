@@ -19,11 +19,18 @@ fn main() {
         &state.assets.music.lamentable,
         &state.assets.music.summer_night_feast,
     ];
-    let mut current_ambience: usize = 0;
+    // start at the end of the list so our handler automatically wraps
+    let mut ambience_i: usize = ambience_tracks.len() - 1;
 
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
             state.is_music_paused = !state.is_music_paused;
+            ambience_tracks[ambience_i].play_stream();
+        }
+        if rl.is_key_pressed(KeyboardKey::KEY_N) || rl.is_key_pressed_repeat(KeyboardKey::KEY_N) {
+            ambience_tracks[ambience_i].stop_stream();
+            advance_track(&mut ambience_i, ambience_tracks.len());
+            ambience_tracks[ambience_i].play_stream();
         }
 
         let mut d = rl.begin_drawing(&thread);
@@ -39,7 +46,7 @@ fn main() {
             }
         }
 
-        let track = &ambience_tracks[current_ambience];
+        let track = &ambience_tracks[ambience_i];
         if state.is_music_paused {
             d.draw_text("Music Paused", 10, 460, 18, Color::GOLDENROD);
 
@@ -49,18 +56,18 @@ fn main() {
 
             track.update_stream();
         } else {
-            if (track.get_time_played() / track.get_time_length()) >= 1.0 {
-                track.stop_stream();
-                current_ambience = (current_ambience + 1) % ambience_tracks.len();
-                let track = ambience_tracks[current_ambience];
+            if !track.is_stream_playing() {
+                advance_track(&mut ambience_i, ambience_tracks.len());
+                let track = ambience_tracks[ambience_i];
                 track.play_stream();
                 track.update_stream();
             } else {
-                if !track.is_stream_playing() {
-                    track.play_stream();
-                }
                 track.update_stream();
             }
         }
     }
+}
+
+fn advance_track(index: &mut usize, track_count: usize) {
+    *index = (*index + 1) % track_count
 }
