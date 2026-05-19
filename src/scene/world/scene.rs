@@ -35,12 +35,12 @@ const ZOOM_FOVY_MAX: f32 = 30.0;
 const ZOOM_FOVY_INCREMENT: f32 = 5.0;
 
 const HELP_TEXTS: [&'static str; 7] = [
-    "Z = debug",
-    "X = toggle wireframe",
-    "[ = zoom out",
-    "] = zoom in",
-    "M = toggle mute",
-    "V = switch view",
+    "esc = pause",
+    "[ = zoom +",
+    "] = zoom +",
+    "M = music on/off",
+    "N = next track",
+    "V = change angle",
     "Q = quit",
 ];
 
