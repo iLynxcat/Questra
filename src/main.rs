@@ -17,7 +17,7 @@ fn main() {
     rl.set_target_fps(60);
     rl.set_exit_key(None);
 
-    let audio = init_audio(0.3);
+    let audio = init_audio(1.0);
     let mut state = GameState::load(&mut rl, &thread, &audio);
 
     let ambience_tracks: Vec<&Music<'_>> = vec![
