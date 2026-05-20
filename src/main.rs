@@ -58,7 +58,13 @@ fn main() {
 
         let track = &ambience_tracks[ambience_i];
         if state.is_music_paused {
-            d.draw_text("Music Paused", 10, 460, 18, Color::GOLDENROD);
+            d.draw_text(
+                "Music Paused",
+                10,
+                d.get_screen_height() - 20,
+                18,
+                Color::GOLDENROD,
+            );
 
             if track.is_stream_playing() {
                 track.pause_stream();
