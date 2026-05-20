@@ -24,8 +24,13 @@ fn main() {
         &state.assets.music.lamentable,
         &state.assets.music.summer_night_feast,
     ];
-    // start at the end of the list so our handler automatically wraps
-    let mut ambience_i: usize = ambience_tracks.len() - 1;
+    let mut ambience_i: usize = if cfg!(debug_assertions) {
+        // muted by default, so unmuting triggers the correct track to play
+        0
+    } else {
+        // start at the end of the list so our handler automatically wraps
+        ambience_tracks.len() - 1
+    };
 
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_M) || rl.is_key_pressed_repeat(KeyboardKey::KEY_M) {
