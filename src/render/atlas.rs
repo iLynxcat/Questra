@@ -1,7 +1,7 @@
 use crate::level::block::{BlockFace, Material};
 
-const ATLAS_COLS: u32 = 4;
-const ATLAS_ROWS: u32 = 4;
+const ATLAS_COLS: u32 = 8;
+const ATLAS_ROWS: u32 = 8;
 
 pub fn tile_uvs(col: u32, row: u32) -> (f32, f32, f32, f32) {
     let (ac, ar) = (ATLAS_COLS as f32, ATLAS_ROWS as f32);
