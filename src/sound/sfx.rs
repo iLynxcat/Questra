@@ -4,6 +4,7 @@ use raylib::audio::{RaylibAudio, Sound};
 
 pub struct SoundEffects<'aud> {
     pub camera_shutter: Sound<'aud>,
+    pub click: Sound<'aud>,
     pub waves_ambience: Sound<'aud>,
 }
 
@@ -11,6 +12,7 @@ impl<'aud> SoundEffects<'aud> {
     pub fn new(audio: &'aud RaylibAudio) -> Self {
         Self {
             camera_shutter: load_effect("shutter.mp3", audio),
+            click: load_effect("click.mp3", audio),
             waves_ambience: load_effect("wave.wav", audio),
         }
     }

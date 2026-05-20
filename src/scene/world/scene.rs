@@ -162,6 +162,9 @@ impl WorldScene {
                         .blocks
                         .insert((hx, hy, hz), Material::Air.default());
                     self.level_mesh_is_dirty = true;
+                    assets.sfx.click.set_volume(0.7);
+                    assets.sfx.click.set_pitch(0.7);
+                    assets.sfx.click.play();
                 }
             } else if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) {
                 let (ox, oy, oz) = offset_from_normal(normal);
@@ -171,6 +174,9 @@ impl WorldScene {
                     .insert((nx, ny, nz), Material::Stone.default());
 
                 self.level_mesh_is_dirty = true;
+                assets.sfx.click.set_volume(0.7);
+                assets.sfx.click.set_pitch(0.5);
+                assets.sfx.click.play();
             }
         }
 
