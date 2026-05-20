@@ -1,6 +1,11 @@
 use std::collections::HashMap;
 
-use crate::level::block::{Block, Material};
+use raylib::math::BoundingBox;
+
+use crate::{
+    level::block::{Block, Material},
+    scene::world::collision::get_block_bounds,
+};
 
 pub struct Level {
     pub blocks: HashMap<(i32, i32, i32), Block>,
@@ -30,7 +35,11 @@ impl Level {
                     } else if y >= LEVEL_Y_SURFACE - 3 && y < LEVEL_Y_SURFACE {
                         Material::Dirt.default()
                     } else if y == LEVEL_Y_SURFACE {
-                        if x > -5 && x < 5 && z > -5 && z < 5 {
+                        if x == LEVEL_XZ_MIN
+                            || x == LEVEL_XZ_MAX - 1
+                            || z == LEVEL_XZ_MIN
+                            || z == LEVEL_XZ_MAX - 1
+                        {
                             Material::Water.default()
                         } else {
                             Material::Grass.default()
@@ -45,5 +54,26 @@ impl Level {
         }
 
         Self { blocks }
+    }
+
+    pub fn overlapping_solid_boxes(&self, aabb: &BoundingBox) -> Vec<BoundingBox> {
+        let x0 = aabb.min.x.floor() as i32;
+        let x1 = aabb.max.x.ceil() as i32;
+        let y0 = aabb.min.y.floor() as i32;
+        let y1 = aabb.max.y.ceil() as i32;
+        let z0 = aabb.min.z.floor() as i32;
+        let z1 = aabb.max.z.ceil() as i32;
+
+        (x0..=x1)
+            .flat_map(|x| {
+                (y0..=y1).flat_map(move |y| {
+                    (z0..=z1).filter_map(move |z| {
+                        self.blocks
+                            .get(&(x, y, z))
+                            .map_or(None, |b| get_block_bounds(b, (x, y, z)))
+                    })
+                })
+            })
+            .collect()
     }
 }
