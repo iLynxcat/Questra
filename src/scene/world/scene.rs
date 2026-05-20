@@ -280,6 +280,8 @@ impl WorldScene {
     }
 
     fn draw_crosshair(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
+        let (screen_w, screen_h) = (d.get_screen_width(), d.get_screen_height());
+
         let mut b = d.begin_blend_mode(BlendMode::BLEND_CUSTOM);
         unsafe {
             raylib_sys::rlSetBlendFactors(
@@ -289,7 +291,14 @@ impl WorldScene {
             );
         }
 
-        b.draw_texture(&assets.crosshair_sprite, 304, 224, Color::WHITE);
+        let txt = &assets.crosshair_sprite;
+
+        b.draw_texture(
+            txt,
+            (screen_w / 2) - (txt.width / 2),
+            (screen_h / 2) - (txt.height / 2),
+            Color::WHITE,
+        );
         drop(b);
     }
 
