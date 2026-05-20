@@ -11,6 +11,7 @@ fn main() {
     let (mut rl, thread) = raylib::init() //
         .size(640, 480)
         .title(TITLE)
+        .resizable()
         .build();
 
     rl.set_target_fps(60);
