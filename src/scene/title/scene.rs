@@ -95,10 +95,6 @@ impl TitleScene {
                     };
                 }
             }
-        } else if rl.is_key_pressed(ffi::KeyboardKey::KEY_SPACE) {
-            self.start_fade_out(FadeTarget::Game);
-        } else if rl.is_key_pressed(ffi::KeyboardKey::KEY_Q) {
-            self.start_fade_out(FadeTarget::Quit);
         } else {
             const ONE_FRAME: f32 = 1.0 / 15.0;
             self.fade_time_remain += rl.get_frame_time();
@@ -108,6 +104,12 @@ impl TitleScene {
             }
 
             self.camera.update(rl);
+        }
+
+        if rl.is_key_pressed(ffi::KeyboardKey::KEY_SPACE) {
+            self.start_fade_out(FadeTarget::Game);
+        } else if rl.is_key_pressed(ffi::KeyboardKey::KEY_Q) {
+            self.start_fade_out(FadeTarget::Quit);
         }
 
         let waves = &assets.sfx.waves_ambience;
