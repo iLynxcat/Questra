@@ -158,25 +158,33 @@ impl WorldScene {
                     .filter(|b| b.material == Material::Barrier)
                     .is_none()
                 {
-                    self.level
+                    if let Some(removed_block) = self
+                        .level
                         .blocks
-                        .insert((hx, hy, hz), Material::Air.default());
+                        .insert((hx, hy, hz), Material::Air.default())
+                    {
+                        let destroy_sound = removed_block.material.destroy_sound(&assets.sfx);
+                        destroy_sound.set_volume(0.7);
+                        destroy_sound.set_pitch(0.7);
+                        destroy_sound.play();
+                    }
+
                     self.level_mesh_is_dirty = true;
-                    assets.sfx.click.set_volume(0.7);
-                    assets.sfx.click.set_pitch(0.7);
-                    assets.sfx.click.play();
                 }
             } else if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) {
                 let (ox, oy, oz) = offset_from_normal(normal);
                 let (nx, ny, nz) = (hx + ox, hy + oy, hz + oz);
-                self.level
-                    .blocks
-                    .insert((nx, ny, nz), Material::Stone.default());
+
+                let placed_block = Material::Stone.default();
+                {
+                    let placement_sound = placed_block.material.placement_sound(&assets.sfx);
+                    placement_sound.set_volume(0.7);
+                    placement_sound.set_pitch(0.5);
+                    placement_sound.play();
+                }
+                self.level.blocks.insert((nx, ny, nz), placed_block);
 
                 self.level_mesh_is_dirty = true;
-                assets.sfx.click.set_volume(0.7);
-                assets.sfx.click.set_pitch(0.5);
-                assets.sfx.click.play();
             }
         }
 

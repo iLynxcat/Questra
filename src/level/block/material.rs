@@ -1,4 +1,9 @@
-use crate::level::block::{Block, BlockState};
+use raylib::audio::Sound;
+
+use crate::{
+    level::block::{Block, BlockState},
+    sound::sfx::SoundEffects,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Material {
@@ -21,6 +26,18 @@ impl Material {
             Material::Stone => Block::new(self, BlockState::None),
             Material::Water => Block::new(self, BlockState::LiquidLevel(1.0)),
             Material::Sign => Block::new(self, BlockState::Sign("".to_string())),
+        }
+    }
+
+    pub fn placement_sound<'sfx>(&self, sfx: &'sfx SoundEffects<'sfx>) -> &'sfx Sound<'sfx> {
+        match self {
+            _ => &sfx.click,
+        }
+    }
+
+    pub fn destroy_sound<'sfx>(&self, sfx: &'sfx SoundEffects<'sfx>) -> &'sfx Sound<'sfx> {
+        match self {
+            _ => &sfx.click,
         }
     }
 }
