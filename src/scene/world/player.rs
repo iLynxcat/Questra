@@ -12,7 +12,7 @@ use crate::{
     scene::{render::lerp_smooth, world::camera::Camera},
 };
 
-const MOVEMENT_SPEED: f32 = 5.0;
+const MOVEMENT_SPEED: f32 = 8.0;
 const MOVEMENT_HALF_LIFE: f32 = 0.1;
 
 const TERMINAL_VELOCITY: f32 = 8.0;
@@ -58,55 +58,11 @@ impl Player {
 
         self.velocity.x = lerp_smooth(self.velocity.x, target.x, MOVEMENT_HALF_LIFE, dt);
         self.velocity.z = lerp_smooth(self.velocity.z, target.z, MOVEMENT_HALF_LIFE, dt);
-
-        let y_target = if self.is_grounded {
-            0.0
-        } else {
-            -TERMINAL_VELOCITY
-        };
-
-        self.velocity.y = lerp_smooth(
-            self.velocity.y,
-            y_target,
-            if self.is_noclip {
-                0.0
-            } else {
-                GRAVITY_HALF_LIFE
-            },
-            dt,
-        );
+        self.velocity.y = lerp_smooth(self.velocity.y, target.y, GRAVITY_HALF_LIFE, dt);
 
         self.position.x += self.velocity.x * dt;
-        for bb in level.overlapping_solid_boxes(&self.get_bounds()) {
-            self.position.x = if self.velocity.x > 0.0 {
-                bb.min.x - PLAYER_BB_DISTANCE_FROM_CENTER
-            } else {
-                bb.max.x + PLAYER_BB_DISTANCE_FROM_CENTER
-            };
-            self.velocity.x = 0.0;
-        }
-
         self.position.z += self.velocity.z * dt;
-        for bb in level.overlapping_solid_boxes(&self.get_bounds()) {
-            self.position.z = if self.velocity.z > 0.0 {
-                bb.min.z - PLAYER_BB_DISTANCE_FROM_CENTER
-            } else {
-                bb.max.z + PLAYER_BB_DISTANCE_FROM_CENTER
-            };
-            self.velocity.z = 0.0;
-        }
-
         self.position.y += self.velocity.y * dt;
-        self.is_grounded = false;
-        for bb in level.overlapping_solid_boxes(&self.get_bounds()) {
-            if self.velocity.y <= 0.0 {
-                self.position.y = bb.max.y;
-                self.is_grounded = true;
-            } else {
-                self.position.y = bb.min.y - PLAYER_BB_HEIGHT;
-            }
-            self.velocity.y = 0.0;
-        }
 
         self.walk_animation_timer += rl.get_frame_time();
         if self.walk_animation_timer >= 1.0 / MOVE_ANIM_FPS {
