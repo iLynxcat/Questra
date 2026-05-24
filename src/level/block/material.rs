@@ -31,13 +31,13 @@ impl Material {
 
     pub fn placement_sound<'sfx>(&self, sfx: &'sfx SoundEffects<'sfx>) -> &'sfx Sound<'sfx> {
         match self {
-            _ => &sfx.click,
+            _ => &sfx.stone_place,
         }
     }
 
     pub fn destroy_sound<'sfx>(&self, sfx: &'sfx SoundEffects<'sfx>) -> &'sfx Sound<'sfx> {
         match self {
-            _ => &sfx.click,
+            _ => &sfx.stone_destroy,
         }
     }
 }

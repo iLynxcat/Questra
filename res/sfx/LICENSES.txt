@@ -1,4 +1,5 @@
-shutter.mp3
+stone_destroy.mp3
+stone_place.mp3
 	Copyright © 2026 Lynn Stratus.
 	All rights reserved.
 	Distributed with Questra with permission.
