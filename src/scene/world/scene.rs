@@ -165,7 +165,6 @@ impl WorldScene {
                     {
                         let destroy_sound = removed_block.material.destroy_sound(&assets.sfx);
                         destroy_sound.set_volume(0.7);
-                        destroy_sound.set_pitch(0.7);
                         destroy_sound.play();
                     }
 
@@ -179,7 +178,6 @@ impl WorldScene {
                 {
                     let placement_sound = placed_block.material.placement_sound(&assets.sfx);
                     placement_sound.set_volume(0.7);
-                    placement_sound.set_pitch(0.5);
                     placement_sound.play();
                 }
                 self.level.blocks.insert((nx, ny, nz), placed_block);
