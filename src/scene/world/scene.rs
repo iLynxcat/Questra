@@ -282,6 +282,13 @@ impl WorldScene {
         }
 
         if self.is_showing_pause_menu {
+            let pause_img = &assets.pause;
+            d.draw_texture(
+                pause_img,
+                d.get_screen_width() - pause_img.width,
+                d.get_screen_height() - pause_img.height,
+                Color::WHITE,
+            );
             draw_frozen_text(d, "Paused");
         } else if self.is_frozen {
             draw_frozen_text(d, "Frozen");
