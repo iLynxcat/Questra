@@ -1,0 +1,9 @@
+atlas.png
+bob.png
+cursor.png
+title.png
+	Copyright © 2026 iLynxcat.
+
+sky.png
+	Dedicated to the public domain (CC0) by Screaming Brain Studios.
+	Retrieved from https://opengameart.org/content/cloudy-skyboxes-0.

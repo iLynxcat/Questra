@@ -1,9 +1,10 @@
+shutter.mp3
 stone_destroy.mp3
 stone_place.mp3
 	Copyright © 2026 Lynn Stratus.
 	All rights reserved.
-	Distributed with Questra with permission.
+	Distributed under exclusive license for Questra.
 
 SeaShore Wave 3 (wave.wav)
+	Dedicated to the public domain (CCO) by garandM1.
 	Retrieved from https://freesound.org/people/garandM1/sounds/799250.
-	CC0.
