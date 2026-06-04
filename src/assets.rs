@@ -8,6 +8,7 @@ pub struct GameAssets<'aud> {
     pub player_sprite: Texture2D,
     pub crosshair_sprite: Texture2D,
     pub texture_atlas: Texture2D,
+    pub sky: Texture2D,
 
     pub music: MusicTracks<'aud>,
     pub sfx: SoundEffects<'aud>,
@@ -31,6 +32,9 @@ impl<'aud> GameAssets<'aud> {
             texture_atlas: rl
                 .load_texture(thread, "res/atlas.png")
                 .expect("Failed to load texture atlas"),
+            sky: rl
+                .load_texture(thread, "res/sky.png")
+                .expect("Failed to load sky background"),
 
             music: MusicTracks::new(audio),
             sfx: SoundEffects::new(audio),
