@@ -79,10 +79,18 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, d3: &mut RaylibMode3D<RaylibDrawHandle>, cam: &Camera, assets: &GameAssets) {
+    pub fn draw(
+        &self,
+        d3: &mut RaylibMode3D<RaylibDrawHandle>,
+        cam: &Camera,
+        assets: &GameAssets,
+        show_wireframe: bool,
+    ) {
         let frame = self.walk_animation_frame as f32;
 
-        self.draw_bounds(d3);
+        if show_wireframe {
+            self.draw_bounds(d3);
+        }
 
         d3.draw_billboard_pro(
             cam.raycam,

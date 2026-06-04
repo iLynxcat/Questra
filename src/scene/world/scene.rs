@@ -260,7 +260,12 @@ impl WorldScene {
             draw_mesh(opaque, self.is_showing_wireframe, 1.0);
         }
 
-        self.player.draw(&mut d3, &self.camera, &assets);
+        self.player.draw(
+            &mut d3,
+            &self.camera,
+            &assets,
+            self.is_showing_debug || self.is_showing_wireframe,
+        );
 
         if let Some(water) = self.level_mesh_water {
             draw_mesh(water, self.is_showing_wireframe, 0.3);
