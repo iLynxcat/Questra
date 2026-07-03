@@ -22,7 +22,7 @@ use raylib::{
     color::Color,
     drawing::{RaylibBlendModeExt, RaylibDraw, RaylibDraw3D, RaylibDrawHandle, RaylibMode3DExt},
     ffi,
-    math::{BoundingBox, Vector3},
+    math::{BoundingBox, Rectangle, Vector2, Vector3},
 };
 use raylib_sys::{BlendMode, KeyboardKey, MouseButton};
 
@@ -253,6 +253,26 @@ impl WorldScene {
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, assets: &GameAssets) {
         d.clear_background(Color::SKYBLUE);
+
+        let sky_texture = &assets.sky;
+        d.draw_texture_pro(
+            &sky_texture,
+            Rectangle::new(
+                0.0,
+                0.0,
+                sky_texture.width as f32,
+                sky_texture.height as f32,
+            ),
+            Rectangle::new(
+                0.0,
+                0.0,
+                d.get_screen_width() as f32,
+                d.get_screen_height() as f32,
+            ),
+            Vector2::new(0.0, 0.0),
+            0.0,
+            Color::WHITE,
+        );
 
         let mut d3 = d.begin_mode3D(&self.camera.raycam);
 

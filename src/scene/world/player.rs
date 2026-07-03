@@ -54,15 +54,28 @@ impl Player {
         let dt = rl.get_frame_time();
 
         let input_speed = get_input_direction(&rl);
-        let target = input_speed * MOVEMENT_SPEED;
+        let input_move_target = input_speed * MOVEMENT_SPEED;
 
-        self.velocity.x = lerp_smooth(self.velocity.x, target.x, MOVEMENT_HALF_LIFE, dt);
-        self.velocity.z = lerp_smooth(self.velocity.z, target.z, MOVEMENT_HALF_LIFE, dt);
-        self.velocity.y = lerp_smooth(self.velocity.y, target.y, GRAVITY_HALF_LIFE, dt);
+        self.velocity.x = lerp_smooth(self.velocity.x, input_move_target.x, MOVEMENT_HALF_LIFE, dt);
+        self.velocity.z = lerp_smooth(self.velocity.z, input_move_target.z, MOVEMENT_HALF_LIFE, dt);
+        self.velocity.y = lerp_smooth(self.velocity.y, input_move_target.y, GRAVITY_HALF_LIFE, dt);
 
-        self.position.x += self.velocity.x * dt;
-        self.position.z += self.velocity.z * dt;
-        self.position.y += self.velocity.y * dt;
+        let mut position_delta = self.velocity * dt;
+        let self_box = &self.get_bounds();
+
+        // resolve Y collision
+        for r#box in level.overlapping_solid_boxes(&self_box) {
+            let y_penetration = r#box.max.y - self_box.min.y;
+            if y_penetration <= 0.0 || y_penetration >= 1.0 {
+                continue;
+            } else if y_penetration < 0.5 {
+                position_delta.y += y_penetration;
+            } else if y_penetration >= 0.5 {
+                position_delta.y -= y_penetration;
+            }
+        }
+
+        self.position += position_delta;
 
         self.walk_animation_timer += rl.get_frame_time();
         if self.walk_animation_timer >= 1.0 / MOVE_ANIM_FPS {
