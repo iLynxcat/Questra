@@ -217,7 +217,7 @@ impl WorldScene {
             self.camera.direction = self.camera.direction.get_next();
         }
 
-        self.player.update(&rl, &self.level);
+        self.player.update(&rl, &self.level, &self.camera);
         self.fps = rl.get_fps();
 
         self.camera.position_destination = self.player.position.add(Vector3::new(

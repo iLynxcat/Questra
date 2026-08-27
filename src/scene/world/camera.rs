@@ -29,6 +29,16 @@ impl CameraDirection {
         let i = Self::DIRECTIONS.iter().position(|d| d == self).unwrap();
         Self::DIRECTIONS[(i + Self::DIRECTIONS.len() - 1) % Self::DIRECTIONS.len()]
     }
+
+    pub fn yaw_radians(&self) -> f32 {
+        use std::f32::consts::FRAC_PI_2;
+        match self {
+            Self::PlusXPlusZ => 0.0,
+            Self::PlusXMinusZ => FRAC_PI_2,
+            Self::MinusXMinusZ => FRAC_PI_2 * 2.0,
+            Self::MinusXPlusZ => FRAC_PI_2 * 3.0,
+        }
+    }
 }
 
 impl Display for CameraDirection {

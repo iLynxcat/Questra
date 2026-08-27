@@ -3,13 +3,16 @@ use raylib::{
     color::Color,
     drawing::{RaylibDraw3D, RaylibDrawHandle, RaylibMode3D},
     ffi::KeyboardKey,
-    math::{BoundingBox, Matrix, Rectangle, Vector2, Vector3},
+    math::{BoundingBox, Matrix, Quaternion, Rectangle, Vector2, Vector3},
 };
 
 use crate::{
     assets::GameAssets,
     level::Level,
-    scene::{render::lerp_smooth, world::camera::Camera},
+    scene::{
+        render::lerp_smooth,
+        world::camera::{Camera, CameraDirection},
+    },
 };
 
 const MOVEMENT_SPEED: f32 = 8.0;
@@ -50,11 +53,12 @@ impl Player {
         }
     }
 
-    pub fn update(&mut self, rl: &RaylibHandle, level: &Level) {
+    pub fn update(&mut self, rl: &RaylibHandle, level: &Level, camera: &Camera) {
         let dt = rl.get_frame_time();
 
-        let input_speed = get_input_direction(&rl);
-        let target = input_speed * MOVEMENT_SPEED;
+        let input_speed = get_input_direction(&rl) * MOVEMENT_SPEED;
+        let facing = Quaternion::from_axis_angle(Vector3::up(), camera.direction.yaw_radians());
+        let target = input_speed.rotate_by(facing);
 
         self.velocity.x = lerp_smooth(self.velocity.x, target.x, MOVEMENT_HALF_LIFE, dt);
         self.velocity.z = lerp_smooth(self.velocity.z, target.z, MOVEMENT_HALF_LIFE, dt);
